@@ -1,11 +1,14 @@
 package com.cognixia.jump.dao;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 public interface UserDao {
 	
-	public void setConnection();
+	public void setConnection() throws FileNotFoundException, ClassNotFoundException, IOException, SQLException;
 	
 	// Authenticate a user
 	public Optional<User> authenticate(String email, String password);
