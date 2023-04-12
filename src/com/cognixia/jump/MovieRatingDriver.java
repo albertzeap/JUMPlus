@@ -2,6 +2,7 @@ package com.cognixia.jump;
 
 import java.util.Scanner;
 
+import com.cognixia.jump.dao.Movie;
 import com.cognixia.jump.dao.User;
 import com.cognixia.jump.util.HelpfulFunctions;
 
@@ -9,7 +10,6 @@ public class MovieRatingDriver {
 
 	public static void main(String[] args) {
 		
-		System.out.println("Welcome to Movie Rater!");
 		Scanner scan = new Scanner(System.in);
 		int choice = HelpfulFunctions.menu(scan);
 		User activeUser = new User();
@@ -18,10 +18,11 @@ public class MovieRatingDriver {
 		if(choice == 1) {
 			Boolean success = false;
 			
-			do {
-				
+			while(!success) {
 				success = HelpfulFunctions.register(scan);
-			} while (!success);
+			}
+			
+			choice = HelpfulFunctions.menu(scan);		
 			
 		}
 		
@@ -34,8 +35,14 @@ public class MovieRatingDriver {
 			
 			// Ensures that null does not print 
 			if(activeUser.getName() != null) {
-				System.out.println("Welcome " + activeUser.getName());
+				System.out.println("====================================");
+				System.out.println("Welcome to the Movie Rating Console App, " + activeUser.getName()+ "!");
+				System.out.println("====================================\n");
 				HelpfulFunctions.loadMovies(activeUser);
+				Movie selected = HelpfulFunctions.selectMovie(scan, activeUser);
+				HelpfulFunctions.rateMovie(scan, selected, activeUser);
+				
+			
 			}
 			
 		}

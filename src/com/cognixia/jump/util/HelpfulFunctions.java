@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cognixia.jump.dao.Movie;
 import com.cognixia.jump.dao.User;
 import com.cognixia.jump.dao.UserDao;
 import com.cognixia.jump.dao.UserDaoSql;
@@ -15,10 +16,17 @@ public class HelpfulFunctions {
 		
 		int choice = 0;
 		
-		System.out.println("1. REGISTER ");
-		System.out.println("2. LOGIN ");
-		System.out.println("3. VIEW MOVIES ");
-		System.out.println("4. EXIT ");
+		System.out.println("====================================");
+		System.out.println("Welcome to the Movie Rating Console App");
+		System.out.println("====================================\n");
+
+		System.out.println("Please select an option below:\n");
+
+		System.out.println("1. Register");
+		System.out.println("2. Login");
+		System.out.println("3. View Movies");
+		System.out.println("4. Exit\n");
+
 		
 		try {
 			
@@ -33,6 +41,7 @@ public class HelpfulFunctions {
 		
 	}
 	
+	
 	static public boolean register(Scanner scan) {
 		
 		// Attributes of a user
@@ -41,9 +50,11 @@ public class HelpfulFunctions {
 		String confirm = null;
 		String name = null;
 		
-		System.out.println("Register Now! ");
+		System.out.println("====================================");
+		System.out.println("Register for the Movie Rating Console App");
+		System.out.println("====================================\n");
 		
-		System.out.println("Enter email ");
+		System.out.println("Please enter your email address:");
 		email = scan.next();
 		
 		String emailRegex = "[a-zA-Z]+@gmail\\.com";
@@ -61,11 +72,11 @@ public class HelpfulFunctions {
 			System.out.println("Email doesn't match");
 		}
 		
-		System.out.println("Enter password");
+		System.out.println("Please enter a password:");
 		password = scan.next();
 	
 		
-		System.out.println("Confirm password");
+		System.out.println("Please confirm your password:");
 		confirm = scan.next();
 		scan.nextLine();
 		
@@ -74,7 +85,7 @@ public class HelpfulFunctions {
 			return false;
 		};
 		
-		System.out.println("Enter Name");
+		System.out.println("Please enter your name:");
 		name = scan.nextLine();
 		
 		// Create the user
@@ -112,18 +123,21 @@ public class HelpfulFunctions {
 		String password = null;
 		
 		// Get user input for login
-		try {
+	
 
-			System.out.println("Enter email");
-			username = scan.next();
+		System.out.println("====================================");
+		System.out.println("Login to the Movie Rating Console App");
+		System.out.println("====================================\n");
+
+		System.out.println("Please enter your email address:");
+		username = scan.next();
+
+		System.out.println("Please enter your password:");
+		password = scan.next();
+
+		
 			
-			System.out.println("Enter password");
-			password = scan.next();
-			
-			
-		} catch(Exception e) {	
-			e.printStackTrace();
-		}
+		
 		
 		// Check the user with the database
 		UserDao userDao = new UserDaoSql();
@@ -161,6 +175,50 @@ public class HelpfulFunctions {
 		} catch(Exception e) {
 			
 		}
+	}
+	
+	static public Movie selectMovie(Scanner scan, User user) {
+		
+		UserDao userDao = new UserDaoSql();
+		int movieId = 0;
+		Movie movie = new Movie();
+		try {
+			
+			System.out.println("Please select a movie to rate:");
+			movieId = scan.nextInt();
+			
+			userDao.setConnection();
+			movie = userDao.getMovieById(movieId);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.getMessage();
+		}
+		
+		return movie;
+	}
+	
+	static public void rateMovie(Scanner scan, Movie movie, User user) {
+		
+		System.out.println("====================================");
+		System.out.println("Rate the following movie: " + movie.getTitle());
+		System.out.println("====================================\n");
+
+		System.out.println(movie.getDescript() + "\n");
+
+		System.out.println("Please enter your rating (1-5):");
+		int rating = scan.nextInt();
+		UserDao userDao = new UserDaoSql();
+		
+		try {
+			userDao.setConnection();
+			userDao.rateMovie(movie, user, rating);
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
 	}
 	
 }

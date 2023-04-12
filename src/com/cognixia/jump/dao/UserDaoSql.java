@@ -50,6 +50,8 @@ public class UserDaoSql implements UserDao {
 				roleType = rs.getInt("roleType");
 			}
 			
+			rs.close();
+			
 			User user = new User(id, uEmail, pwd, name, roleType);
 			
 			Optional<User> userFound = Optional.of(user);
@@ -66,7 +68,7 @@ public class UserDaoSql implements UserDao {
 	@Override
 	public List<Movie> getMovies() {
 		
-		try(PreparedStatement pstmnt = conn.prepareStatement("select * from movie join user_movie on user_movie.movieId = movie.movieId")) {
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT m.movieId, m.title, m.descript, COUNT(um.rating) AS num_ratings, ROUND(AVG(um.rating), 1) AS avg_rating FROM Movie m LEFT JOIN User_Movie um ON m.movieId = um.movieId GROUP BY m.movieId, m.title")) {
 			
 			// Execute the query
 			ResultSet rs = pstmnt.executeQuery();
@@ -81,26 +83,22 @@ public class UserDaoSql implements UserDao {
 			int userId = 0;
 			int rating = 0;
 			boolean favorite = false;
+			int numRatings = 0;
+			double avgRating = 0d;
 			
-			System.out.printf("%10s %20s %20s %-10s%n", "Movie ID","Title", "Description", "Rating");
+			System.out.printf("%-5s %-40s %-15s %-15s\n", "ID", "Title", "# Ratings", "Avg Rating");
 			System.out.println("\n----------------------------------------------------------------------------------------------------------------");
 			while(rs.next()) {
-				
-				// Movie attributes
-				movieId = rs.getInt("movie.movieId");
-				title = rs.getString("movie.title");
-				description = rs.getString("movie.descript");
-				
-				//UserMovie attributes
-				userMovieId = rs.getInt("user_movie.movieId");
-				userId = rs.getInt("user_movie.userId");
-				rating = rs.getInt("user_movie.rating");
-				favorite = rs.getBoolean("user_movie.favorite");
-				
-				System.out.printf("%10s %20s %20s %-10s%n", movieId,title, description, rating);	
-			}
 			
-//			System.out.print(movieId + " " + title + " " + description + rating +"\n");
+				 movieId = rs.getInt("movieId");
+				 title = rs.getString("title");
+				 numRatings = rs.getInt("num_ratings");
+				 avgRating = rs.getDouble("avg_rating");
+	
+				   
+				System.out.printf("%-5d %-40s %-15d %-15.1f\n", movieId, title, numRatings, avgRating);
+			}
+			System.out.println();
 		
 			return null;
 			
@@ -126,14 +124,68 @@ public class UserDaoSql implements UserDao {
 	}
 
 	@Override
-	public Optional<Movie> getMovieById(int movieId) {
-		// TODO Auto-generated method stub
-		return Optional.empty();
+	public Movie getMovieById(int id) {
+	
+		try(PreparedStatement pstmnt = conn.prepareStatement("select * from movie where movieId = ?")) {
+			
+			String myId = String.valueOf(id);		
+			pstmnt.setInt(1, id);
+			
+			ResultSet rs = pstmnt.executeQuery();
+			
+			int movieId = 0;
+			String title = null;
+			String descript = null;
+			
+			while(rs.next()) {
+				
+				movieId = rs.getInt("movieId");
+				title = rs.getString("title");
+				descript = rs.getNString("descript");
+				
+				
+			}
+			rs.close();
+			
+			// constructing the object
+			Movie movie = new Movie(movieId, title, descript);
+			
+			if(movie.getTitle() == null) {
+				throw new Exception("Movie does not exist");
+			}
+			
+			return movie;
+			
+			
+		} catch (Exception e) {
+			e.getMessage();
+			e.printStackTrace();
+		}
+		
+		
+		return null;
 	}
 
 	@Override
-	public boolean rateMovie(int movieId) {
-		// TODO Auto-generated method stub
+	public boolean rateMovie(Movie movie, User user, int rating) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("insert into user_movie (userId, movieId, rating) values (?,?, ?)")) {
+			
+			pstmnt.setInt(1, user.getUserId() );
+			pstmnt.setInt(2, movie.getMovieId());
+			pstmnt.setInt(3, rating);
+			
+			pstmnt.executeUpdate();
+			
+			return true;
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		
+		
 		return false;
 	}
 

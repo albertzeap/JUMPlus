@@ -26,10 +26,10 @@ public interface UserDao {
 	public List<UserMovie> getUserMovie(int userId, int movieId);
 	
 	// Obtain a movie by Id
-	public Optional<Movie> getMovieById(int movieId);
+	public Movie getMovieById(int movieId);
 	
 	// Rate a show
-	public boolean rateMovie(int movieId);
+	public boolean rateMovie(Movie movie, User user, int rating);
 	
 	// Add a movie to favorites
 	public boolean favoriteMovie(int userId, int movieId);
