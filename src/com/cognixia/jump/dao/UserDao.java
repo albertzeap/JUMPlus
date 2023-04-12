@@ -10,6 +10,9 @@ public interface UserDao {
 	
 	public void setConnection() throws FileNotFoundException, ClassNotFoundException, IOException, SQLException;
 	
+	// Create an account 
+	public boolean createAccount(User newUser);
+	
 	// Authenticate a user
 	public Optional<User> authenticate(String email, String password);
 	

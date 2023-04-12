@@ -37,6 +37,7 @@ public class UserDaoSql implements UserDao {
 			int id = 0; 
 			String uEmail = null;
 			String pwd = null;
+			String name = null;
 			int roleType = 0;
 			
 			// While the query is reading the values
@@ -45,10 +46,11 @@ public class UserDaoSql implements UserDao {
 				id = rs.getInt("userId");
 				uEmail = rs.getString("email");
 				pwd = rs.getString("password");
+				name = rs.getString("name");
 				roleType = rs.getInt("roleType");
 			}
 			
-			User user = new User(id, uEmail, pwd, roleType);
+			User user = new User(id, uEmail, pwd, name, roleType);
 			
 			Optional<User> userFound = Optional.of(user);
 			
@@ -63,7 +65,51 @@ public class UserDaoSql implements UserDao {
 
 	@Override
 	public List<Movie> getMovies() {
-		// TODO Auto-generated method stub
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("select * from movie join user_movie on user_movie.movieId = movie.movieId")) {
+			
+			// Execute the query
+			ResultSet rs = pstmnt.executeQuery();
+			
+			// Movie Attributes
+			int movieId = 0;
+			String title = null;
+			String description = null;
+			
+			//UserMovie attributes
+			int userMovieId = 0;
+			int userId = 0;
+			int rating = 0;
+			boolean favorite = false;
+			
+			System.out.printf("%10s %20s %20s %-10s%n", "Movie ID","Title", "Description", "Rating");
+			System.out.println("\n----------------------------------------------------------------------------------------------------------------");
+			while(rs.next()) {
+				
+				// Movie attributes
+				movieId = rs.getInt("movie.movieId");
+				title = rs.getString("movie.title");
+				description = rs.getString("movie.descript");
+				
+				//UserMovie attributes
+				userMovieId = rs.getInt("user_movie.movieId");
+				userId = rs.getInt("user_movie.userId");
+				rating = rs.getInt("user_movie.rating");
+				favorite = rs.getBoolean("user_movie.favorite");
+				
+				System.out.printf("%10s %20s %20s %-10s%n", movieId,title, description, rating);	
+			}
+			
+//			System.out.print(movieId + " " + title + " " + description + rating +"\n");
+		
+			return null;
+			
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		
 		return null;
 	}
 
@@ -94,6 +140,30 @@ public class UserDaoSql implements UserDao {
 	@Override
 	public boolean favoriteMovie(int userId, int movieId) {
 		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean createAccount(User newUser) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("INSERT INTO users (email, password, name) values (?,?,?)")) {
+			
+			pstmnt.setString(1, newUser.getEmail());
+			pstmnt.setString(2, newUser.getPassword());
+			pstmnt.setString(3, newUser.getName());
+			
+			pstmnt.executeUpdate();
+			
+			return true;
+			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
 		return false;
 	}
 
