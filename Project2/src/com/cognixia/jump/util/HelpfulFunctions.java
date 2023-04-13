@@ -1,5 +1,6 @@
 package com.cognixia.jump.util;
 
+import java.util.InputMismatchException;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -22,23 +23,63 @@ public class HelpfulFunctions {
 
 		System.out.println("Please select an option below:\n");
 
+		System.out.println("0. Exit");
 		System.out.println("1. Register");
 		System.out.println("2. Login");
-		System.out.println("3. View Movies");
-		System.out.println("4. Exit\n");
+		System.out.println("3. View Movies\n");
 
 		
 		try {
 			
 			choice = scan.nextInt();
+//			scan.nextLine();
+			
+			if(choice != 0 && choice != 1 && choice !=2 && choice != 3) {
+				throw new Exception("Please enter a choice within the range 0-3\n");
+			}
 			
 			
-		} catch (Exception e) {
+		} catch(InputMismatchException e) { 
 			e.printStackTrace();
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 		
 		return choice;
 		
+	}
+	
+	static public int userMenu(Scanner scan, User user) {
+		System.out.println("====================================");
+		System.out.println("Welcome to the Movie Rating Console App, " + user.getName()+ "!");
+		System.out.println("====================================\n");
+		System.out.println("What would you like to do?\n");
+
+		System.out.println("0. Exit");
+		System.out.println("1. Rate Movies\n");
+//		System.out.println("2. View Previous Ratings");
+//		System.out.println("3. Edit Ratings");
+//		System.out.println("4. View Favorites\n");
+		
+	
+		int userAction = 0;
+		
+		try {
+			userAction= scan.nextInt();
+			
+			if(userAction < 0 || userAction > 3) {
+				throw new Exception("Invalid input. Please enter a valid option(0-4)");
+			}
+			
+		} catch(InputMismatchException e) {
+			e.printStackTrace();
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		return userAction;
 	}
 	
 	
@@ -55,63 +96,71 @@ public class HelpfulFunctions {
 		System.out.println("====================================\n");
 		
 		System.out.println("Please enter your email address:");
-		email = scan.next();
 		
-		String emailRegex = "[a-zA-Z]+@gmail\\.com";
 		
 		// regex pattern
+		String emailRegex = "[a-zA-Z]+[0-9]*@[a-z]+\\.com";
+		String nameRegex = "[A-Z][a-z]+\s[A-Z][a-z]+";
 		Pattern pattern = Pattern.compile(emailRegex);
+		Pattern namePattern = Pattern.compile(nameRegex);
 		
-		// matcher created with pattern and string
-		Matcher matcher = pattern.matcher(email);
 		
-		if(matcher.matches()) {
-			System.out.println("Email matches");
-		}
-		else {
-			System.out.println("Email doesn't match");
-		}
-		
-		System.out.println("Please enter a password:");
-		password = scan.next();
-	
-		
-		System.out.println("Please confirm your password:");
-		confirm = scan.next();
-		scan.nextLine();
-		
-		if(!password.equals(confirm)) {
-			System.out.println("Passwords do not match");
-			return false;
-		};
-		
-		System.out.println("Please enter your name:");
-		name = scan.nextLine();
-		
-		// Create the user
-		User user = new User();
-		user.setEmail(email);
-		user.setPassword(password);
-		user.setName(name);
 		
 		UserDao userDao = new UserDaoSql();
 		
 		try {
 			
+			email = scan.next();
+			
+			// matcher created with pattern and string
+			Matcher matcher = pattern.matcher(email);
+			
+			if(!matcher.matches()) {
+				throw new Exception("Invalid email format:\nExample: example@gmail.com\n");
+			}
+			
+			System.out.println("Please enter a password:");
+			password = scan.next();
+			
+			
+			System.out.println("Please confirm your password:");
+			confirm = scan.next();
+			scan.nextLine();
+			
+			if(!password.equals(confirm)) {
+				System.out.println("Passwords do not match\n");
+				return false;
+			};
+			
+			System.out.println("Please enter your name:");
+			name = scan.nextLine();
+			
+			Matcher nameMatcher = namePattern.matcher(name);
+			
+			if(!nameMatcher.matches()) {
+				throw new Exception("Invalid name entered\nExample: Firstname Lastname\n");
+			}
+			
+			// Create the user
+			User user = new User();
+			user.setEmail(email);
+			user.setPassword(password);
+			user.setName(name);
+			
 			userDao.setConnection();
 			Boolean created = userDao.createAccount(user);
 			
 			if(created) {
-				System.out.println("Your account has been created " + user.getName());
+				System.out.println("Your account has been created " + user.getName() +"!\n");
 			} else {
-				System.out.println("Could not create account");
+				System.out.println("Could not create account\n");
 				return false;
 			}
 			
 			return true;
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			System.out.println(e.getMessage());
 		}
 		return false;
 		
@@ -173,26 +222,35 @@ public class HelpfulFunctions {
 			
 			
 		} catch(Exception e) {
-			
+			System.out.println(e.getMessage());
 		}
 	}
 	
 	static public Movie selectMovie(Scanner scan, User user) {
 		
 		UserDao userDao = new UserDaoSql();
-		int movieId = 0;
+		int movieId = -1;
 		Movie movie = new Movie();
 		try {
 			
 			System.out.println("Please select a movie to rate:");
 			movieId = scan.nextInt();
+
+			// Option to quit
+			if(movieId == 0) {
+				return movie;
+			}
 			
 			userDao.setConnection();
 			movie = userDao.getMovieById(movieId);
+			return movie;
+			
+		} catch(InputMismatchException e) {
+			e.printStackTrace();
+//			System.out.println(e.getMessage());
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
+			System.out.println(e.getMessage());
 		}
 		
 		return movie;
@@ -203,20 +261,26 @@ public class HelpfulFunctions {
 		System.out.println("====================================");
 		System.out.println("Rate the following movie: " + movie.getTitle());
 		System.out.println("====================================\n");
-
 		System.out.println(movie.getDescript() + "\n");
-
 		System.out.println("Please enter your rating (1-5):");
-		int rating = scan.nextInt();
+		
 		UserDao userDao = new UserDaoSql();
 		
 		try {
+			
+			int rating = scan.nextInt();
+			if(rating < 1 || rating > 5) {
+				throw new Exception("Invalid input. Please enter a number between 1 and 5");
+			}
+			
+			
 			userDao.setConnection();
 			userDao.rateMovie(movie, user, rating);
-			
-			
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch(InputMismatchException e) {
+			System.out.println(e.getMessage());
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 
 	}

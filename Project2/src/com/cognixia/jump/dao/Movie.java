@@ -8,7 +8,7 @@ public class Movie {
 	private String descript;
 	
 	public Movie() {
-		
+
 	}
 	
 	public Movie(int movieId, String title, String descript) {

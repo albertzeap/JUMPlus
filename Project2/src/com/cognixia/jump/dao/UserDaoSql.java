@@ -133,7 +133,7 @@ public class UserDaoSql implements UserDao {
 			
 			ResultSet rs = pstmnt.executeQuery();
 			
-			int movieId = 0;
+			int movieId = -1;
 			String title = null;
 			String descript = null;
 			
@@ -151,15 +151,14 @@ public class UserDaoSql implements UserDao {
 			Movie movie = new Movie(movieId, title, descript);
 			
 			if(movie.getTitle() == null) {
-				throw new Exception("Movie does not exist");
+				throw new Exception("Please enter a movie ID that is present in the table\n");
 			}
 			
 			return movie;
 			
 			
 		} catch (Exception e) {
-			e.getMessage();
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		
 		
