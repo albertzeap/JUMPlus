@@ -23,7 +23,7 @@ public interface UserDao {
 	public List<Movie> getFavorites(int userId);
 	
 	// Obtain the list of user's movie ratings
-	public List<UserMovie> getUserMovie(int userId, int movieId);
+	public boolean getUserRatings(int userId);
 	
 	// Obtain a movie by Id
 	public Movie getMovieById(int movieId);

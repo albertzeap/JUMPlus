@@ -118,9 +118,41 @@ public class UserDaoSql implements UserDao {
 	}
 
 	@Override
-	public List<UserMovie> getUserMovie(int userId, int movieId) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean getUserRatings(int userId) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT m.movieId, m.title, m.descript, um.rating FROM Movie m LEFT JOIN User_Movie um ON m.movieId = um.movieId LEFT JOIN Users u ON u.userId = um.userId WHERE u.userId = ?")){
+			
+			pstmnt.setInt(1, userId);
+			ResultSet rs = pstmnt.executeQuery();
+			
+			
+			int movieId = 0;
+			String title = null;
+			String descript = null;
+			int rating = 0;
+			
+			System.out.println(String.format("| %-8s | %-40s | %-7s |", "Movie ID", "Title", "Rating"));
+			System.out.println("-----------------------------------------------------");
+			while(rs.next()) {
+				
+				movieId = rs.getInt("m.movieId");
+				title = rs.getString("m.title");
+				descript = rs.getString("m.descript");
+				rating = rs.getInt("um.rating");
+				System.out.println(String.format("| %-8s | %-40s | %-7s |", movieId, title, rating));
+			}
+			System.out.println();
+			rs.close();
+			
+			return true;
+			
+		} catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		
+		
+		return false;
 	}
 
 	@Override

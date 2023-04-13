@@ -57,8 +57,8 @@ public class HelpfulFunctions {
 		System.out.println("What would you like to do?\n");
 
 		System.out.println("0. Exit");
-		System.out.println("1. Rate Movies\n");
-//		System.out.println("2. View Previous Ratings");
+		System.out.println("1. Rate Movies");
+		System.out.println("2. View Previous Ratings\n");
 //		System.out.println("3. Edit Ratings");
 //		System.out.println("4. View Favorites\n");
 		
@@ -283,6 +283,23 @@ public class HelpfulFunctions {
 			System.out.println(e.getMessage());
 		}
 
+	}
+	
+	static public void viewPreviousRatings(User user) {
+		
+		UserDao userDao = new UserDaoSql();
+		
+		try {
+			
+			userDao.setConnection();
+			boolean success = userDao.getUserRatings(user.getUserId());
+			if(!success) {
+				throw new Exception("Failed to obtain user ratings\n");
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 }

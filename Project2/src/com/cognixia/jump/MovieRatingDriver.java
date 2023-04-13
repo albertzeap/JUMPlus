@@ -36,19 +36,7 @@ public class MovieRatingDriver {
 			do {
 				activeUser = HelpfulFunctions.login(scan);
 			} while(activeUser.getName() == null);
-			
-			
-			
-//			System.out.println("====================================");
-//			System.out.println("Welcome to the Movie Rating Console App, " + activeUser.getName()+ "!");
-//			System.out.println("====================================\n");
-//			System.out.println("What would you like to do?\n");
-//
-//			System.out.println("0. Exit");
-//			System.out.println("1. View Previous Ratings");
-//			System.out.println("2. Edit Ratings");
-//			System.out.println("3. View Favorites\n");
-			
+					
 		
 	
 				do {
@@ -69,17 +57,18 @@ public class MovieRatingDriver {
 						}
 					}
 					
-					
-					
-					
+					if(userAction == 2) {
+						HelpfulFunctions.viewPreviousRatings(activeUser);
+					}
 				} while (choice != 0);	
+				
 			}
 				
 
 		
 		
 		
-		
+		// Just to view the movies
 		if(choice == 3) {
 			
 			HelpfulFunctions.loadMovies(activeUser);
