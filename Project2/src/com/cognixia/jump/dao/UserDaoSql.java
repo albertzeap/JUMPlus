@@ -66,7 +66,7 @@ public class UserDaoSql implements UserDao {
 	}
 
 	@Override
-	public List<Movie> getMovies() {
+	public boolean getMovies() {
 		
 		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT m.movieId, m.title, m.descript, COUNT(um.rating) AS num_ratings, ROUND(AVG(um.rating), 1) AS avg_rating FROM Movie m LEFT JOIN User_Movie um ON m.movieId = um.movieId GROUP BY m.movieId, m.title")) {
 			
@@ -100,7 +100,7 @@ public class UserDaoSql implements UserDao {
 			}
 			System.out.println();
 		
-			return null;
+			return true;
 			
 			
 		} catch(Exception e) {
@@ -108,7 +108,7 @@ public class UserDaoSql implements UserDao {
 		}
 		
 		
-		return null;
+		return false;
 	}
 
 	@Override
@@ -246,6 +246,28 @@ public class UserDaoSql implements UserDao {
 		}
 		
 		
+		
+		return false;
+	}
+
+	@Override
+	public boolean editRating(int movieId, int userId, int rating) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("UPDATE user_movie SET rating = ? WHERE userId = ? AND movieId = ?")) {
+			
+			pstmnt.setInt(1, rating);
+			pstmnt.setInt(2, userId);
+			pstmnt.setInt(3, movieId);
+			
+			int count = pstmnt.executeUpdate();
+			
+			if(count > 0) {
+				return true;
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 		
 		return false;
 	}

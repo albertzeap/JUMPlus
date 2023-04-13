@@ -60,6 +60,11 @@ public class MovieRatingDriver {
 					if(userAction == 2) {
 						HelpfulFunctions.viewPreviousRatings(activeUser);
 					}
+					if(userAction == 3) {
+						HelpfulFunctions.editPreviousRatings(scan, activeUser);
+					}
+					
+					
 				} while (choice != 0);	
 				
 			}

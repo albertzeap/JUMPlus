@@ -58,8 +58,8 @@ public class HelpfulFunctions {
 
 		System.out.println("0. Exit");
 		System.out.println("1. Rate Movies");
-		System.out.println("2. View Previous Ratings\n");
-//		System.out.println("3. Edit Ratings");
+		System.out.println("2. View Previous Ratings");
+		System.out.println("3. Edit Ratings\n");
 //		System.out.println("4. View Favorites\n");
 		
 	
@@ -300,6 +300,49 @@ public class HelpfulFunctions {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+	}
+	
+	static public void editPreviousRatings(Scanner scan, User user) {
+		
+		viewPreviousRatings(user);
+		System.out.println("What would you like to do?\n");
+		System.out.println("1. Edit Rating");
+		System.out.println("2. Delete Rating");
+		
+		int editDelete = 0;
+		UserDao userDao = new UserDaoSql();
+		try {
+			
+			editDelete = scan.nextInt();
+			if(editDelete < 1 || editDelete >2) {
+				throw new Exception("Invalid input. Please enter a valid input(1-2)");
+			}
+			
+			if(editDelete == 1) {
+				int movieId = 0;
+				int rating = 0;
+				System.out.println("Which movie would you like to edit?\n");
+				movieId = scan.nextInt();
+				System.out.println("What rating would you like to give(1-5)?\n");
+				rating = scan.nextInt();
+				if(rating < 1 || rating > 5) {
+					throw new Exception("Invalid input. Please enter a number between 1 and 5");
+				}
+				
+				userDao.setConnection();
+				boolean updated = userDao.editRating(movieId, user.getUserId(), rating);
+				if(!updated) {
+					throw new Exception("Failed to update movie with ID " + movieId + "with rating of " + rating);
+				}
+				
+				System.out.println("Movie of ID " + movieId + " updated with rating of " + rating + "\n");
+			}
+			
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
 	}
 	
 }

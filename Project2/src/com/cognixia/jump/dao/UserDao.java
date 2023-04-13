@@ -17,7 +17,7 @@ public interface UserDao {
 	public Optional<User> authenticate(String email, String password);
 	
 	// Obtain the list of movies
-	public List<Movie> getMovies();
+	public boolean getMovies();
 	
 	// Obtain the users favorite list
 	public List<Movie> getFavorites(int userId);
@@ -33,5 +33,8 @@ public interface UserDao {
 	
 	// Add a movie to favorites
 	public boolean favoriteMovie(int userId, int movieId);
+	
+	// Edit movie rating
+	public boolean editRating(int movieId, int userId, int rating);
 	
 }
