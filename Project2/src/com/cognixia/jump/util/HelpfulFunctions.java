@@ -18,7 +18,7 @@ public class HelpfulFunctions {
 		int choice = 0;
 		
 		System.out.println("====================================");
-		System.out.println("Welcome to the Movie Rating Console App");
+		System.out.println("Welcome to Movie Mania!");
 		System.out.println("====================================\n");
 
 		System.out.println("Please select an option below:\n");
@@ -52,7 +52,7 @@ public class HelpfulFunctions {
 	
 	static public int userMenu(Scanner scan, User user) {
 		System.out.println("====================================");
-		System.out.println("Welcome to the Movie Rating Console App, " + user.getName()+ "!");
+		System.out.println("Welcome " + user.getName()+ "!");
 		System.out.println("====================================\n");
 		System.out.println("What would you like to do?\n");
 
@@ -92,7 +92,7 @@ public class HelpfulFunctions {
 		String name = null;
 		
 		System.out.println("====================================");
-		System.out.println("Register for the Movie Rating Console App");
+		System.out.println("Register for the Movie Mania");
 		System.out.println("====================================\n");
 		
 		System.out.println("Please enter your email address:");
@@ -116,7 +116,7 @@ public class HelpfulFunctions {
 			Matcher matcher = pattern.matcher(email);
 			
 			if(!matcher.matches()) {
-				throw new Exception("Invalid email format:\nExample: example@gmail.com\n");
+				throw new Exception("Invalid email format. Please use the following format : example@gmail.com\n");
 			}
 			
 			System.out.println("Please enter a password:");
@@ -175,7 +175,7 @@ public class HelpfulFunctions {
 	
 
 		System.out.println("====================================");
-		System.out.println("Login to the Movie Rating Console App");
+		System.out.println("Login to Movie Mania");
 		System.out.println("====================================\n");
 
 		System.out.println("Please enter your email address:");
