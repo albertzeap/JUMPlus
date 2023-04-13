@@ -332,10 +332,24 @@ public class HelpfulFunctions {
 				userDao.setConnection();
 				boolean updated = userDao.editRating(movieId, user.getUserId(), rating);
 				if(!updated) {
-					throw new Exception("Failed to update movie with ID " + movieId + "with rating of " + rating);
+					throw new Exception("Failed to update movie with ID " + movieId + " with rating of " + rating);
 				}
 				
 				System.out.println("Movie of ID " + movieId + " updated with rating of " + rating + "\n");
+			}
+			
+			
+			// Delete rating
+			if(editDelete == 2) {
+				int movieId = 0;
+				System.out.println("Which movie rating would you like to delete?\n");
+				movieId = scan.nextInt();
+				userDao.setConnection();
+				boolean deleted = userDao.deleteRating(movieId, user.getUserId());
+				if(!deleted) {
+					throw new Exception("Failed to delete movie with ID " + movieId);
+				}
+				System.out.println("Successfully deleted movie with ID " + movieId);
 			}
 			
 			
@@ -344,5 +358,6 @@ public class HelpfulFunctions {
 		}
 		
 	}
+	
 	
 }

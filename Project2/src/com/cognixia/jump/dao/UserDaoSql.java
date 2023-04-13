@@ -272,4 +272,29 @@ public class UserDaoSql implements UserDao {
 		return false;
 	}
 
+	@Override
+	public boolean deleteRating(int movieId, int userId) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("DELETE FROM user_movie WHERE userId = ? AND movieId = ?")) {
+			
+			pstmnt.setInt(1, userId);
+			pstmnt.setInt(2, movieId);
+			
+			int count = pstmnt.executeUpdate();
+			
+			if (count > 0) {
+				return true;
+			}
+			
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		
+		return false;
+	}
+	
+	
+
 }

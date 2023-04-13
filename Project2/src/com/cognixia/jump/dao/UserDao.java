@@ -37,4 +37,6 @@ public interface UserDao {
 	// Edit movie rating
 	public boolean editRating(int movieId, int userId, int rating);
 	
+	public boolean deleteRating(int movieId, int userId);
+	
 }
