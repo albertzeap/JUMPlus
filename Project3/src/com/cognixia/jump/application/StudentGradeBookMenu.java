@@ -1,5 +1,6 @@
 package com.cognixia.jump.application;
 
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,13 +15,16 @@ public class StudentGradeBookMenu {
 	static public void run() {
 		
 		Scanner scan = new Scanner(System.in);
+		Teacher activeUser = null;
 		
 		
 		int firstMenuChoice = landingMenu(scan);
 		if(firstMenuChoice == 1) {
 			registerMenu(scan);
-		} else if (firstMenuChoice == 2) {
-			
+			firstMenuChoice = landingMenu(scan);
+		}
+		if (firstMenuChoice == 2) {
+			activeUser = loginMenu(scan);
 		}
 		
 		
@@ -125,4 +129,43 @@ public class StudentGradeBookMenu {
 		}
 	}
 	
+	static public Teacher loginMenu(Scanner scan) {
+		String username = null;
+		String password = null;
+		TeacherDao teacherDao = new TeacherDaoSql();
+		
+
+		System.out.println("====================================");
+		System.out.println("Login to Grade Book");
+		System.out.println("====================================\n");
+		boolean authenticated = false;
+		while(!authenticated) {
+			System.out.println("Please enter your username:");
+			username = scan.next();
+			
+			System.out.println("Please enter your password:");
+			password = scan.next();
+			
+			try {
+				teacherDao.setConnection();
+				Optional<Teacher> valid = teacherDao.login(username, password);
+				if (valid.isEmpty()) {
+					System.out.println("Invalid credentials\n");
+				} else {
+					System.out.println("Successfully logged in!");
+					return valid.get();
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+			
+		}
+		
+		return null;
+	}
+	
+	static public void viewClasses() {
+		
+	}
 }
+
