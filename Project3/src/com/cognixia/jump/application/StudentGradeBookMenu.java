@@ -305,7 +305,10 @@ public class StudentGradeBookMenu {
 				break;
 			case 2:
 				teacherDao.sortByName(classId);
-				
+				break;
+			case 3: 
+				teacherDao.sortByGrade(classId);
+				break;
 			
 			}
 			

@@ -42,6 +42,8 @@ public interface TeacherDao {
 	
 	public void sortByName(int classId);
 	
+	public void sortByGrade(int classId);
+	
 }
 
 
