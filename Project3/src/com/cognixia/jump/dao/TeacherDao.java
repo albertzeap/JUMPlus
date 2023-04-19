@@ -39,4 +39,9 @@ public interface TeacherDao {
 	
 	// Link a teacher to a class
 	public boolean linkTeacherToClass(int classId, int teacherId);
+	
+	public void sortByName(int classId);
+	
 }
+
+

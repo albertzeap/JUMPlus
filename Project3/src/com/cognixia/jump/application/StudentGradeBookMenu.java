@@ -275,14 +275,14 @@ public class StudentGradeBookMenu {
 			
 			
 			teacherDao.getStudentsInClass(classId);
-			classMenu(scan);
+			classMenu(scan, classId);
 			
 		} catch (Exception e) {
 			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 	}
 	
-	static void classMenu(Scanner scan) {
+	static void classMenu(Scanner scan, int classId) {
 		System.out.println("What would you like to do?\n");
 		System.out.println("1. View Average and Median");
 		System.out.println("2. Sort Students by Name");
@@ -290,6 +290,30 @@ public class StudentGradeBookMenu {
 		System.out.println("4. Update Student Grade");
 		System.out.println("5. Add Student to Class");
 		System.out.println("6. Remove Student from Class\n");
+		// Add exit option here
+		
+		int classChoice = 0;
+		TeacherDao teacherDao = new TeacherDaoSql();
+		
+		try {
+			classChoice = scan.nextInt();
+			teacherDao.setConnection();
+			
+			switch(classChoice) {
+			
+			case 1:
+				break;
+			case 2:
+				teacherDao.sortByName(classId);
+				
+			
+			}
+			
+			
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
 	}
 	
 	static public void createClass(Scanner scan, Teacher activeUser) {
