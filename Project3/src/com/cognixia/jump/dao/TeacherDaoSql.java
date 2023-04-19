@@ -159,7 +159,7 @@ public class TeacherDaoSql implements TeacherDao {
 			String name = null;
 			int grade = 0;
 			
-			System.out.printf("%-10s%-20s%-10s%n", "StudentID", "Name", "Grade");
+			System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
 			System.out.println();
 
 			while(rs.next()) {
@@ -171,7 +171,6 @@ public class TeacherDaoSql implements TeacherDao {
 				System.out.printf("%-10d%-20s%-10d%n", studentId, name, grade);
 			}
 			System.out.println();
-			
 			
 		} catch (Exception e) {
 			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
@@ -291,7 +290,7 @@ public class TeacherDaoSql implements TeacherDao {
 			String name = null;
 			int grade = 0;
 			
-			System.out.printf("%-10s%-20s%-10s%n", "StudentID", "Name", "Grade");
+			System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
 			System.out.println();
 
 			while(rs.next()) {
@@ -322,7 +321,7 @@ public class TeacherDaoSql implements TeacherDao {
 			String name = null;
 			int grade = 0;
 			
-			System.out.printf("%-10s%-20s%-10s%n", "StudentID", "Name", "Grade");
+			System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
 			System.out.println();
 
 			while(rs.next()) {
@@ -340,6 +339,12 @@ public class TeacherDaoSql implements TeacherDao {
 			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 		
+	}
+
+	@Override
+	public double getClassAverage(int classId) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 

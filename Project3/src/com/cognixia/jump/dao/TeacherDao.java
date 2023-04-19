@@ -40,10 +40,14 @@ public interface TeacherDao {
 	// Link a teacher to a class
 	public boolean linkTeacherToClass(int classId, int teacherId);
 	
+	// Sort by student name
 	public void sortByName(int classId);
 	
+	// Sort by student grades
 	public void sortByGrade(int classId);
 	
+	// Get the class average
+	public double getClassAverage(int classId); 
 }
 
 

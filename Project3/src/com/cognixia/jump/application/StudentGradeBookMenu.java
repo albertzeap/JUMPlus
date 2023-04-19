@@ -41,6 +41,10 @@ public class StudentGradeBookMenu {
 				createClass(scan, activeUser);
 			}
 			
+			if(teacherMenuChoice == 3) {
+				System.out.println("Thank You!");
+			}
+			
 			
 		}
 		
@@ -55,17 +59,30 @@ public class StudentGradeBookMenu {
 			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Welcome to Grade Book!");
 			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 
-			System.out.println("Please select an option below:\n");
+			System.out.println(ConsoleColors.ANSI_ITALIC + "Please select an option below:\n" + ConsoleColors.ANSI_RESET);
 
 			System.out.println("1. Register");
-			System.out.println("2. Login\n");
+			System.out.println("2. Login");
+			System.out.println("3. Exit\n");
 			
-			System.out.print(ConsoleColors.ANSI_CYAN);
-			firstMenuChoice = scan.nextInt();
 			
-			if(firstMenuChoice == 1 || firstMenuChoice == 2) {
+			try {
+				System.out.print(ConsoleColors.ANSI_CYAN);
+				firstMenuChoice = scan.nextInt();
+				System.out.print(ConsoleColors.ANSI_RESET);
+				if(firstMenuChoice != 1 && firstMenuChoice != 2 && firstMenuChoice != 3) {
+					throw new Exception(ConsoleColors.ANSI_RED + "Invalid Input. Please select an option from above(1-3)" + ConsoleColors.ANSI_RESET);
+				}
 				return firstMenuChoice;
+				
+			} catch(InputMismatchException e) { 
+				System.out.println(ConsoleColors.ANSI_RED + "Invalid Input. Please select an option from above(1-2)" + ConsoleColors.ANSI_RESET);
+				scan.nextLine();
+			} catch (Exception e) {
+				System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 			}
+			
+			
 		}
 	}
 	
@@ -87,11 +104,12 @@ public class StudentGradeBookMenu {
 				// Username validation 
 				boolean exists = true;
 				while (exists) {
-					System.out.println("Please enter your username:");
+					System.out.print(ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter your username:" + ConsoleColors.ANSI_RESET);
 					
 					System.out.print(ConsoleColors.ANSI_CYAN);
 					username = scan.next();
-					
+					System.out.print(ConsoleColors.ANSI_RESET);
 					// Check if username already exists
 					teacherDao.setConnection();
 					exists = teacherDao.teacherExists(username);
@@ -103,12 +121,16 @@ public class StudentGradeBookMenu {
 				// Password validation
 				boolean matches = false;
 				while(!matches) {
-					System.out.println(ConsoleColors.ANSI_RESET + "Please enter a password:");
+					System.out.println(ConsoleColors.ANSI_ITALIC +"Please enter a password:" + ConsoleColors.ANSI_RESET);
 					System.out.print(ConsoleColors.ANSI_CYAN);
 					password = scan.next();
-					System.out.println(ConsoleColors.ANSI_RESET + "Please confirm your password:");
+					System.out.print(ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_ITALIC +"Please confirm your password:"+ ConsoleColors.ANSI_RESET);
+					
 					System.out.print(ConsoleColors.ANSI_CYAN);
 					String confirm = scan.next();
+					System.out.print(ConsoleColors.ANSI_RESET);
+					
 					scan.nextLine();
 					if(!password.equals(confirm)) {
 						System.out.println(ConsoleColors.ANSI_RED + "Passwords do not match\n" + ConsoleColors.ANSI_RESET);
@@ -123,9 +145,11 @@ public class StudentGradeBookMenu {
 				
 				boolean validName = false;
 				while(!validName) {
-					System.out.println(ConsoleColors.ANSI_RESET + "Please enter your name:");
+					System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter your name:" + ConsoleColors.ANSI_RESET);
+					
 					System.out.print(ConsoleColors.ANSI_CYAN);
 					name = scan.nextLine();
+					System.out.print(ConsoleColors.ANSI_RESET);
 					
 					Matcher nameMatcher = namePattern.matcher(name);
 					if(!nameMatcher.matches()) {
@@ -140,7 +164,7 @@ public class StudentGradeBookMenu {
 				if(!created) {
 					throw new Exception(ConsoleColors.ANSI_RED + "Could not create user\n" + ConsoleColors.ANSI_RESET);
 				} else {
-					System.out.println("User successfully created!");
+					System.out.println(ConsoleColors.ANSI_GREEN + "User successfully created!" + ConsoleColors.ANSI_RESET);
 					break;
 				}
 				
@@ -163,13 +187,15 @@ public class StudentGradeBookMenu {
 		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 		boolean authenticated = false;
 		while(!authenticated) {
-			System.out.println(ConsoleColors.ANSI_RESET + "Please enter your username:");
+			System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter your username:" + ConsoleColors.ANSI_RESET);
 			System.out.print(ConsoleColors.ANSI_CYAN);
 			username = scan.next();
 			
-			System.out.println(ConsoleColors.ANSI_RESET + "Please enter your password:");
+			System.out.print(ConsoleColors.ANSI_RESET);
+			System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter your password:" + ConsoleColors.ANSI_RESET);
 			System.out.print(ConsoleColors.ANSI_CYAN);
 			password = scan.next();
+			System.out.print(ConsoleColors.ANSI_RESET);
 			
 			try {
 				teacherDao.setConnection();
@@ -191,31 +217,41 @@ public class StudentGradeBookMenu {
 	
 	static public int teacherMenu(Scanner scan, Teacher activeUser) {
 		int teacherMenuChoice = 0;
+		boolean teacherMenuActive = true;
 		
-		System.out.println("====================================");
-		System.out.println("Welcome " + activeUser.getName()+ "!");
-		System.out.println("====================================\n");
-		
-		viewClasses(activeUser);
-		
-		System.out.println("What would you like to do?\n");
-		
-		System.out.println("1. Select Class");
-		System.out.println("2. Create Class\n");
-		
-		try {
-			teacherMenuChoice = scan.nextInt();
-			scan.nextLine();
+		while(teacherMenuActive) {
 			
-			if(teacherMenuChoice < 1 || teacherMenuChoice > 3) {
-				throw new Exception("Invalid input. Please enter a valid option(0-4)");
+			System.out.println("====================================");
+			System.out.println("Welcome " + activeUser.getName()+ "!");
+			System.out.println("====================================\n");
+			
+			viewClasses(activeUser);
+			
+			System.out.println(ConsoleColors.ANSI_ITALIC + "What would you like to do?\n" + ConsoleColors.ANSI_RESET);
+			
+			System.out.println("1. Select Class");
+			System.out.println("2. Create Class");
+			System.out.println("3. Exit\n");
+			
+			try {
+				System.out.print(ConsoleColors.ANSI_CYAN);
+				teacherMenuChoice = scan.nextInt();
+				System.out.print(ConsoleColors.ANSI_RESET);
+				scan.nextLine();
+				
+				if(teacherMenuChoice < 1 || teacherMenuChoice > 3) {
+					throw new Exception(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
+				}
+				
+				break;
+				
+			} catch(InputMismatchException e) {
+				System.out.println(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(0-4)" + ConsoleColors.ANSI_RESET);
+				scan.nextLine();
+				
+			} catch (Exception e) {
+				System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 			}
-			
-		} catch(InputMismatchException e) {
-			e.printStackTrace();
-			
-		} catch (Exception e) {
-			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 		
 		
@@ -236,7 +272,7 @@ public class StudentGradeBookMenu {
 				System.out.println("No classes currently being taught\n");
 			} else {
 				
-				 System.out.printf("%-10s%-10s%n", "ClassID", "Subject");
+				 System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-10s%n", "Class ID", "Subject" + ConsoleColors.ANSI_RESET);
 				for(Classroom subject : classes) {
 					System.out.printf("%-10s%-10s%n", subject.getClassId(), subject.getSubject());
 				}
@@ -254,7 +290,7 @@ public class StudentGradeBookMenu {
 	static public void selectClass(Scanner scan) {
 		
 		TeacherDao teacherDao = new TeacherDaoSql();
-		System.out.println("Please enter the class you would like to view");
+		System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter the class you would like to view" + ConsoleColors.ANSI_RESET);
 		int classId = 0;
 		
 		try {
@@ -275,6 +311,7 @@ public class StudentGradeBookMenu {
 			
 			
 			teacherDao.getStudentsInClass(classId);
+			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 			classMenu(scan, classId);
 			
 		} catch (Exception e) {
@@ -283,39 +320,66 @@ public class StudentGradeBookMenu {
 	}
 	
 	static void classMenu(Scanner scan, int classId) {
-		System.out.println("What would you like to do?\n");
-		System.out.println("1. View Average and Median");
-		System.out.println("2. Sort Students by Name");
-		System.out.println("3. Sort Students by Grade");
-		System.out.println("4. Update Student Grade");
-		System.out.println("5. Add Student to Class");
-		System.out.println("6. Remove Student from Class\n");
-		// Add exit option here
-		
-		int classChoice = 0;
-		TeacherDao teacherDao = new TeacherDaoSql();
-		
-		try {
-			classChoice = scan.nextInt();
-			teacherDao.setConnection();
+		boolean active = true;
+		while(active) {
+			System.out.println(ConsoleColors.ANSI_ITALIC + "What would you like to do?\n" + ConsoleColors.ANSI_RESET);
+//			System.out.println("1. View Average and Median");
+			System.out.println("1. Sort Students by Name");
+			System.out.println("2. Sort Students by Grade");
+			System.out.println("3. Update Student Grade");
+			System.out.println("4. Add Student to Class");
+			System.out.println("5. Remove Student from Class");
+			System.out.println("6. Exit\n");
+			// Add exit option here
 			
-			switch(classChoice) {
+			int classChoice = 0;
+			TeacherDao teacherDao = new TeacherDaoSql();
 			
-			case 1:
-				break;
-			case 2:
-				teacherDao.sortByName(classId);
-				break;
-			case 3: 
-				teacherDao.sortByGrade(classId);
-				break;
-			
+			try {
+				classChoice = scan.nextInt();
+				
+				teacherDao.setConnection();
+				
+				switch(classChoice) {
+				
+				
+				case 1:
+					System.out.println();
+					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Name");
+					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+					teacherDao.sortByName(classId);
+					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+					break;
+				case 2:
+					System.out.println();
+					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Grade");
+					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+					teacherDao.sortByGrade(classId);
+					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+					break;
+				case 3:
+					break;
+				case 4:
+					break;
+				case 5:
+					break;
+				case 6: 
+					active = false;
+					break;
+				default:
+					throw new Exception(ConsoleColors.ANSI_RED + "Please enter a valid input" + ConsoleColors.ANSI_RESET);
+					
+				}
+				
+				
+				
+			} catch(InputMismatchException e) { 
+				System.out.println(ConsoleColors.ANSI_RED + "Please enter a valid input" + ConsoleColors.ANSI_RESET);
+				scan.nextLine();
+			} catch (Exception e) {
+				System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 			}
 			
-			
-			
-		} catch (Exception e) {
-			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 	}
 	
@@ -324,7 +388,7 @@ public class StudentGradeBookMenu {
 		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Create a Class");
 		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 		
-		System.out.println("Please enter the subject of the class\n");
+		System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter the subject of the class\n" + ConsoleColors.ANSI_RESET);
 		
 		// Add validation here later
 		String subject = scan.nextLine();
