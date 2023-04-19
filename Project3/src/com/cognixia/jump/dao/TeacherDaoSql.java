@@ -6,12 +6,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.cognixia.jump.connection.BetterConnectionManager;
 import com.cognixia.jump.model.Classroom;
 import com.cognixia.jump.model.Teacher;
+import com.cognixia.jump.util.ConsoleColors;
 
 public class TeacherDaoSql implements TeacherDao {
 	
@@ -46,7 +48,7 @@ public class TeacherDaoSql implements TeacherDao {
 				return true;
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 		return false;
 	}
@@ -71,7 +73,7 @@ public class TeacherDaoSql implements TeacherDao {
 			return true;
 		
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 		return false;
 	}
@@ -103,28 +105,148 @@ public class TeacherDaoSql implements TeacherDao {
 			}
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
-		
-		
 		return Optional.empty();
 	}
 
 	@Override
 	public List<Classroom> viewClasses(int teacherId) {
-		// TODO Auto-generated method stub
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT c.classId, subject FROM classroom c JOIN teaches t ON c.classId = t.classId WHERE t.teacherId = ?")) {
+			
+			pstmnt.setInt(1, teacherId);
+			
+			ResultSet rs = pstmnt.executeQuery();
+			
+			int classId = 0; 
+			String subject = null;
+			List<Classroom> classes = new ArrayList<>();
+			
+			while(rs.next()) {
+				classId = rs.getInt("c.classId");
+				subject = rs.getString("subject");
+				
+				if(subject == null) {
+					return classes;
+				} else {
+					classes.add(new Classroom(classId, subject));
+				}
+				
+				
+			}
+			
+			return classes;
+			
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		
+		
 		return null;
 	}
 
 	@Override
-	public Optional<Classroom> getClassById(int classId) {
-		// TODO Auto-generated method stub
+	public Optional<Classroom> getStudentsInClass(int classId) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT s.studentId, s.name, e.grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ?")) {
+			
+			pstmnt.setInt(1, classId);
+			ResultSet rs = pstmnt.executeQuery();
+			
+			int studentId = 0;
+			String name = null;
+			int grade = 0;
+			
+			System.out.println();
+			System.out.printf("%-10s%-20s%-10s%n", "StudentID", "Name", "Grade");
+
+			while(rs.next()) {
+				
+				rs.getInt("s.studentId");
+				rs.getString("s.name");
+				rs.getInt("e.grade");
+				
+				System.out.printf("%-10d%-20s%-10d%n", studentId, name, grade);
+			}
+			
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		
+		
+		return Optional.empty();
+	}
+	
+	@Override
+	public Optional<Classroom> getClassBySubject(String subject) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT * FROM classroom WHERE subject = ?")){
+			
+			pstmnt.setString(1, subject);
+			ResultSet rs = pstmnt.executeQuery();
+			
+			int classId = 0;
+			String newSubject = null;
+			
+			while(rs.next()) {
+				classId = rs.getInt("classId");
+				newSubject = rs.getString("subject");
+			}
+			
+			if(subject == null) {
+				return Optional.empty();
+			}
+			
+			Classroom classroom = new Classroom(classId, newSubject);
+			Optional<Classroom> found = Optional.of(classroom);
+			return found;
+			
+		} catch(Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
 		return Optional.empty();
 	}
 
 	@Override
-	public boolean createClass(Classroom newClass) {
-		// TODO Auto-generated method stub
+	public boolean createClass(Classroom newClass, int teacherId) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("INSERT INTO classroom VALUES (null,?)")) {
+			
+			pstmnt.setString(1, newClass.getSubject());
+			int count = pstmnt.executeUpdate();
+			
+			if(count > 0) {
+				return true;
+			}
+			
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		
+		
+		return false;
+	}
+
+	@Override
+	public boolean linkTeacherToClass(int classId, int teacherId) {
+	try(PreparedStatement pstmnt = conn.prepareStatement("INSERT INTO teaches VALUES (?,?)")) {
+			
+			pstmnt.setInt(1, teacherId);
+			pstmnt.setInt(2, classId);
+			int count = pstmnt.executeUpdate();
+			
+			if(count > 0) {
+				return true;
+			}
+			
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
 		return false;
 	}
 

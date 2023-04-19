@@ -26,8 +26,14 @@ public interface TeacherDao {
 	public List<Classroom> viewClasses(int teacherId);
 	
 	// Select class by Id
-	public Optional<Classroom> getClassById(int classId);
+	public Optional<Classroom> getStudentsInClass(int classId);
+	
+	// Select class by subject
+	public Optional<Classroom> getClassBySubject(String subject);
 	
 	// Create a class
-	public boolean createClass(Classroom newClass);
+	public boolean createClass(Classroom newClass, int teacherId);
+	
+	// Link a teacher to a class
+	public boolean linkTeacherToClass(int classId, int teacherId);
 }
