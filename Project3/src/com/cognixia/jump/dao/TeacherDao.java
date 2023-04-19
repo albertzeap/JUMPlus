@@ -25,8 +25,11 @@ public interface TeacherDao {
 	// View classes
 	public List<Classroom> viewClasses(int teacherId);
 	
-	// Select class by Id
+	// Select class and show students in class
 	public Optional<Classroom> getStudentsInClass(int classId);
+	
+	// Select class by Id
+	public Optional<Classroom> getClassById(int classId);
 	
 	// Select class by subject
 	public Optional<Classroom> getClassBySubject(String subject);

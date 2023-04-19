@@ -202,8 +202,6 @@ public class StudentGradeBookMenu {
 		
 		System.out.println("1. Select Class");
 		System.out.println("2. Create Class\n");
-//		System.out.println("3. Edit Ratings\n");
-//		System.out.println("4. View Favorites\n");
 		
 		try {
 			teacherMenuChoice = scan.nextInt();
@@ -265,11 +263,33 @@ public class StudentGradeBookMenu {
 			
 			
 			teacherDao.setConnection();
+			
+			Optional<Classroom> found = teacherDao.getClassById(classId);
+			if(found.isEmpty()) {
+				throw new Exception(ConsoleColors.ANSI_RED + "Could not find selected class" + ConsoleColors.ANSI_RESET);
+			}
+			
+			System.out.println("====================================");
+			System.out.println(found.get().getSubject());
+			System.out.println("====================================\n");
+			
+			
 			teacherDao.getStudentsInClass(classId);
+			classMenu(scan);
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
+	}
+	
+	static void classMenu(Scanner scan) {
+		System.out.println("What would you like to do?\n");
+		System.out.println("1. View Average and Median");
+		System.out.println("2. Sort Students by Name");
+		System.out.println("3. Sort Students by Grade");
+		System.out.println("4. Update Student Grade");
+		System.out.println("5. Add Student to Class");
+		System.out.println("6. Remove Student from Class\n");
 	}
 	
 	static public void createClass(Scanner scan, Teacher activeUser) {

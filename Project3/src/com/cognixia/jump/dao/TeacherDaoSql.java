@@ -159,17 +159,18 @@ public class TeacherDaoSql implements TeacherDao {
 			String name = null;
 			int grade = 0;
 			
-			System.out.println();
 			System.out.printf("%-10s%-20s%-10s%n", "StudentID", "Name", "Grade");
+			System.out.println();
 
 			while(rs.next()) {
 				
-				rs.getInt("s.studentId");
-				rs.getString("s.name");
-				rs.getInt("e.grade");
+				studentId = rs.getInt("s.studentId");
+				name = rs.getString("s.name");
+				grade = rs.getInt("e.grade");
 				
 				System.out.printf("%-10d%-20s%-10d%n", studentId, name, grade);
 			}
+			System.out.println();
 			
 			
 		} catch (Exception e) {
@@ -196,7 +197,7 @@ public class TeacherDaoSql implements TeacherDao {
 				newSubject = rs.getString("subject");
 			}
 			
-			if(subject == null) {
+			if(newSubject == null) {
 				return Optional.empty();
 			}
 			
@@ -248,6 +249,35 @@ public class TeacherDaoSql implements TeacherDao {
 			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 		return false;
+	}
+
+	@Override
+	public Optional<Classroom> getClassById(int classId) {
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT * FROM classroom WHERE classId = ?")){
+			
+			pstmnt.setInt(1, classId);
+			ResultSet rs = pstmnt.executeQuery();
+			
+			int newClassId = 0;
+			String newSubject = null;
+			
+			while(rs.next()) {
+				newClassId = rs.getInt("classId");
+				newSubject = rs.getString("subject");
+			}
+			
+			if(newSubject == null) {
+				return Optional.empty();
+			}
+			
+			Classroom classroom = new Classroom(newClassId, newSubject);
+			Optional<Classroom> found = Optional.of(classroom);
+			return found;
+			
+		} catch(Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		return Optional.empty();
 	}
 
 
