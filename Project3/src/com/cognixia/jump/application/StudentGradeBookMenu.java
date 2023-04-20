@@ -55,9 +55,9 @@ public class StudentGradeBookMenu {
 		int firstMenuChoice = 0;
 		
 		while(true) {
-			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================");
+			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================");
 			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Welcome to Grade Book!");
-			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
+			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 
 			System.out.println(ConsoleColors.ANSI_ITALIC + "Please select an option below:\n" + ConsoleColors.ANSI_RESET);
 
@@ -89,9 +89,9 @@ public class StudentGradeBookMenu {
 	static public void registerMenu(Scanner scan) {
 		
 		while(true) {
-			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT +"====================================");
+			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT +"====================================");
 			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT+ "Register for Grade Book");
-			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT+ "====================================\n");
+			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 			
 			
 			TeacherDao teacherDao = new TeacherDaoSql();
@@ -182,9 +182,9 @@ public class StudentGradeBookMenu {
 		TeacherDao teacherDao = new TeacherDaoSql();
 		
 
-		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================");
+		System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================");
 		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Login to Grade Book");
-		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
+		System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT +  "====================================\n" + ConsoleColors.ANSI_RESET);
 		boolean authenticated = false;
 		while(!authenticated) {
 			System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter your username:" + ConsoleColors.ANSI_RESET);
@@ -221,9 +221,9 @@ public class StudentGradeBookMenu {
 		
 		while(teacherMenuActive) {
 			
-			System.out.println("====================================");
-			System.out.println("Welcome " + activeUser.getName()+ "!");
-			System.out.println("====================================\n");
+			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================");
+			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Welcome " + activeUser.getName()+ "!");
+			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 			
 			viewClasses(activeUser);
 			
@@ -310,9 +310,9 @@ public class StudentGradeBookMenu {
 					throw new Exception(ConsoleColors.ANSI_RED + "Could not find selected class" + ConsoleColors.ANSI_RESET);
 				}
 				
-				System.out.println("====================================");
-				System.out.println(found.get().getSubject());
-				System.out.println("====================================\n");
+				System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================");
+				System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + found.get().getSubject());
+				System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 				
 				double average = 0.0;
 				double median = 0.0;
@@ -363,6 +363,7 @@ public class StudentGradeBookMenu {
 				
 				switch(classChoice) {
 				
+				// Sort by name
 				case 1:
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Name");
@@ -372,6 +373,8 @@ public class StudentGradeBookMenu {
 					teacherDao.sortByName(classId);
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
+					
+				// Sort by grade
 				case 2:
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Grade");
@@ -381,10 +384,30 @@ public class StudentGradeBookMenu {
 					teacherDao.sortByGrade(classId);
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
+					
+				// Update grade
 				case 3:
+					int studentId = 0;
+					int grade = 0;
+					System.out.println();
+					System.out.println(ConsoleColors.ANSI_ITALIC + "Which student grade would you like to update?" + ConsoleColors.ANSI_RESET);
+					
+					System.out.println(ConsoleColors.ANSI_CYAN);
+					studentId = scan.nextInt();
+					System.out.println(ConsoleColors.ANSI_RESET);
+					
+					System.out.println(ConsoleColors.ANSI_ITALIC + "What grade would you like to update to?" + ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_CYAN);
+					grade = scan.nextInt();
+					System.out.println(ConsoleColors.ANSI_RESET);
+					
+					teacherDao.updateStudentGrade(classId, studentId, grade);
+					
 					break;
+				// Add student 
 				case 4:
 					break;
+				// Remove student
 				case 5:
 					break;
 				case 6: 
@@ -408,9 +431,9 @@ public class StudentGradeBookMenu {
 	}
 	
 	static public void createClass(Scanner scan, Teacher activeUser) {
-		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================");
+		System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================");
 		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Create a Class");
-		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
+		System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 		
 		System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter the subject of the class\n" + ConsoleColors.ANSI_RESET);
 		

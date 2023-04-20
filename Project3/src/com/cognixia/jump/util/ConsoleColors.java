@@ -10,5 +10,6 @@ public class ConsoleColors {
 	public static final String ANSI_ITALIC = "\u001b[3m";
 	public static final String ANSI_WHITE = "\u001b[37m";
 	public static final String ANSI_YELLOW = "\u001b[33m";
+	public static final String ANSI_BLUE_BRIGHT = "\u001b[1;94m";
 
 }

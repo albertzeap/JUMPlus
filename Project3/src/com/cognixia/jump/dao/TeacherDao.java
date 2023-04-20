@@ -51,6 +51,9 @@ public interface TeacherDao {
 	
 	// Get the class median
 	public double getClassMedian(int classId);
+	
+	// Update student grade
+	public boolean updateStudentGrade(int classId, int studentId, int grade);
 }
 
 

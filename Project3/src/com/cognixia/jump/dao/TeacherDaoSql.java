@@ -403,5 +403,28 @@ public class TeacherDaoSql implements TeacherDao {
 		return median;
 	}
 
+	@Override
+	public boolean updateStudentGrade(int classId, int studentId, int grade) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("UPDATE enrolled SET grade = ? WHERE classId = ? AND studentId = ? ")) {
+			
+			pstmnt.setInt(1, grade);
+			pstmnt.setInt(2, classId);
+			pstmnt.setInt(3, studentId);
+			
+			int count = pstmnt.executeUpdate();
+			
+			if(count < 0) {
+				throw new Exception(ConsoleColors.ANSI_RED + "Could not update" + ConsoleColors.ANSI_RESET);
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		
+		return true;
+	}
+
 
 }
