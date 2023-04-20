@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import com.cognixia.jump.connection.BetterConnectionManager;
 import com.cognixia.jump.model.Classroom;
+import com.cognixia.jump.model.Student;
 import com.cognixia.jump.model.Teacher;
 import com.cognixia.jump.util.ConsoleColors;
 
@@ -424,6 +425,65 @@ public class TeacherDaoSql implements TeacherDao {
 		
 		
 		return true;
+	}
+
+	@Override
+	public List<Student> getAllStudentsNotInClass(int classId) {
+		
+		List<Student> students = new ArrayList<>();
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT s.* FROM student s LEFT JOIN enrolled e ON s.studentId = e.studentId AND e.classId = ? WHERE e.classId IS NULL;")) {			
+			
+			pstmnt.setInt(1, classId);
+			ResultSet rs = pstmnt.executeQuery();
+			
+			
+			int studentId = 0;
+			String username = null;
+			String password = null;
+			String name = null;
+			
+			while(rs.next()) {
+				
+				studentId = rs.getInt("studentId");
+				username = rs.getString("username");
+				password = rs.getString("password");
+				name = rs.getString("name");
+				
+				Student student = new Student(studentId, username, password, name);
+				
+				students.add(student);
+			}
+			
+			
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		
+		return students;
+	}
+
+	@Override
+	public boolean addStudentToClass(int studentId, int classId) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("INSERT INTO enrolled (studentId, classId) VALUES (?,?)")) {
+			
+			pstmnt.setInt(1, studentId);
+			pstmnt.setInt(2, classId);
+			
+			int count = pstmnt.executeUpdate();
+			
+			if(count > 0) {
+				return true;
+			}
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		
+		
+		return false;
 	}
 
 

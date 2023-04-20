@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.cognixia.jump.model.Classroom;
+import com.cognixia.jump.model.Student;
 import com.cognixia.jump.model.Teacher;
 
 public interface TeacherDao {
@@ -54,6 +55,12 @@ public interface TeacherDao {
 	
 	// Update student grade
 	public boolean updateStudentGrade(int classId, int studentId, int grade);
+	
+	// Get all students
+	public List<Student> getAllStudentsNotInClass(int classId);
+	
+	// Add a student to a class
+	public boolean addStudentToClass(int studentId, int classId);
 }
 
 

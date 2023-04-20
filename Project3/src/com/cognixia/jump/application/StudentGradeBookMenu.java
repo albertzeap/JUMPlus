@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import com.cognixia.jump.dao.TeacherDao;
 import com.cognixia.jump.dao.TeacherDaoSql;
 import com.cognixia.jump.model.Classroom;
+import com.cognixia.jump.model.Student;
 import com.cognixia.jump.model.Teacher;
 import com.cognixia.jump.util.ConsoleColors;
 
@@ -406,6 +407,31 @@ public class StudentGradeBookMenu {
 					break;
 				// Add student 
 				case 4:
+					List<Student> students = teacherDao.getAllStudentsNotInClass(classId);
+					
+					if(students.isEmpty()) {
+						System.out.println("All students enrolled in class");
+						break;
+					} else { 
+						
+						System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-10s%n", "StudentID", "Name" + ConsoleColors.ANSI_RESET);
+						System.out.println();
+						for(Student stu : students) {
+							System.out.printf("%-10d%-10s%n", stu.getStudentId(), stu.getName());
+							
+						}
+					}
+					
+					int studentIdToAdd = 0;
+					System.out.println();
+					System.out.println(ConsoleColors.ANSI_ITALIC + "Which student would you like to add?" + ConsoleColors.ANSI_RESET);
+					studentIdToAdd = scan.nextInt();
+					
+					boolean success = teacherDao.addStudentToClass(studentIdToAdd, classId);
+					if(!success) {
+						throw new Exception(ConsoleColors.ANSI_RED + "Error adding student to class" + ConsoleColors.ANSI_RESET);
+					}
+					System.out.println(ConsoleColors.ANSI_GREEN + "Student successfully added to class!" + ConsoleColors.ANSI_RESET );
 					break;
 				// Remove student
 				case 5:
