@@ -11,5 +11,8 @@ public class ConsoleColors {
 	public static final String ANSI_WHITE = "\u001b[37m";
 	public static final String ANSI_YELLOW = "\u001b[33m";
 	public static final String ANSI_BLUE_BRIGHT = "\u001b[1;94m";
+	public static final String BLACK_BACKGROUND = "\033[40m";  // BLACK
+	 public static final String PURPLE = "\033[0;35m";  // PURPLE
+	 public static final String YELLOW_UNDERLINED = "\033[4;33m"; // YELLOW
 
 }

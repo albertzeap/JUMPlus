@@ -34,19 +34,12 @@ public class StudentGradeBookMenu {
 			activeUser = loginMenu(scan);
 			teacherMenuChoice = teacherMenu(scan, activeUser);
 			
-			if(teacherMenuChoice == 1) {
-				selectClass(scan);
-			}
-			
-			if(teacherMenuChoice == 2) {
-				createClass(scan, activeUser);
-			}
-			
 			if(teacherMenuChoice == 3) {
-				System.out.println("Thank You!");
+				System.out.println("Thank you for using Grade Book. We hope you had a pleasant experience!\n");
 			}
-			
-			
+		}
+		if(firstMenuChoice == 3) {
+			System.out.println("Thank you for using Grade Book. We hope you had a pleasant experience!\n");
 		}
 		
 		
@@ -238,13 +231,24 @@ public class StudentGradeBookMenu {
 				System.out.print(ConsoleColors.ANSI_CYAN);
 				teacherMenuChoice = scan.nextInt();
 				System.out.print(ConsoleColors.ANSI_RESET);
-				scan.nextLine();
 				
-				if(teacherMenuChoice < 1 || teacherMenuChoice > 3) {
+				switch(teacherMenuChoice) {
+				
+				case 1:
+					selectClass(scan);
+					break;
+				case 2: 
+					createClass(scan, activeUser);
+					break;
+				case 3:
+					teacherMenuActive = false;
+					break;
+				default:
 					throw new Exception(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
 				}
 				
-				break;
+				
+				
 				
 			} catch(InputMismatchException e) {
 				System.out.println(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
@@ -273,7 +277,7 @@ public class StudentGradeBookMenu {
 				System.out.println("No classes currently being taught\n");
 			} else {
 				
-				 System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-10s%n", "Class ID", "Subject" + ConsoleColors.ANSI_RESET);
+				 System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-10s%n", "Class ID", "Subject" + ConsoleColors.ANSI_RESET);
 				for(Classroom subject : classes) {
 					System.out.printf("%-10s%-10s%n", subject.getClassId(), subject.getSubject());
 				}
@@ -298,8 +302,10 @@ public class StudentGradeBookMenu {
 			int classId = 0;
 			
 			try {
-				
+				System.out.print(ConsoleColors.ANSI_CYAN);
 				classId = scan.nextInt();
+				System.out.print(ConsoleColors.ANSI_RESET);
+				
 				if(classId == 0) {
 					break;
 				}
@@ -320,11 +326,16 @@ public class StudentGradeBookMenu {
 				average = teacherDao.getClassAverage(classId);
 				median = teacherDao.getClassMedian(classId);
 				
-				System.out.println("Class Average: " + average);
-				System.out.println("Class Median: " + median + "\n");
+				System.out.println( ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Average: " + average + ConsoleColors.ANSI_RESET);
+				System.out.println( ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Median: " + median + "\n" + ConsoleColors.ANSI_RESET);
 				teacherDao.getStudentsInClass(classId);
 				System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
-				classMenu(scan, classId);
+				int classMenuChoice = classMenu(scan, classId);
+				
+				// Go back to previous menu
+				if(classMenuChoice == 6) {
+					break;
+				}
 				
 			} catch(InputMismatchException e) {
 				System.out.println(ConsoleColors.ANSI_RED + "Attempted to select invalid class. Please select one from the list" + ConsoleColors.ANSI_RESET);
@@ -336,8 +347,9 @@ public class StudentGradeBookMenu {
 		
 	}
 	
-	static void classMenu(Scanner scan, int classId) {
+	static int classMenu(Scanner scan, int classId) {
 		boolean active = true;
+		int classChoice = 0;
 		while(active) {
 			System.out.println(ConsoleColors.ANSI_ITALIC + "What would you like to do?\n" + ConsoleColors.ANSI_RESET);
 			System.out.println("1. Sort Students by Name");
@@ -348,40 +360,45 @@ public class StudentGradeBookMenu {
 			System.out.println("6. Exit\n");
 			// Add exit option here
 			
-			int classChoice = 0;
 			TeacherDao teacherDao = new TeacherDaoSql();
 			
 			try {
+				System.out.println(ConsoleColors.ANSI_CYAN);
 				classChoice = scan.nextInt();
+				System.out.println(ConsoleColors.ANSI_RESET);
 				
 				teacherDao.setConnection();
 				
 				double average = 0.0;
 				double median = 0.0;
 				
-				average = teacherDao.getClassAverage(classId);
-				median = teacherDao.getClassMedian(classId);
 				
 				switch(classChoice) {
 				
 				// Sort by name
 				case 1:
+					average = teacherDao.getClassAverage(classId);
+					median = teacherDao.getClassMedian(classId);
+					
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Name");
-					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
-					System.out.println("Class Average: " + average);
-					System.out.println("Class Median: " + median + "\n");
+					System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC + "Class Average: " + average + ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC + "Class Median: "  + median + "\n" + ConsoleColors.ANSI_RESET);
 					teacherDao.sortByName(classId);
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
 					
 				// Sort by grade
 				case 2:
+					average = teacherDao.getClassAverage(classId);
+					median = teacherDao.getClassMedian(classId);
+
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Grade");
-					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
-					System.out.println("Class Average: " + average);
-					System.out.println("Class Median: " + median + "\n");
+					System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Average: " + average + ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Median: " +  median + "\n" + ConsoleColors.ANSI_RESET);
 					teacherDao.sortByGrade(classId);
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
@@ -414,7 +431,7 @@ public class StudentGradeBookMenu {
 						break;
 					} else { 
 						
-						System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-10s%n", "StudentID", "Name" + ConsoleColors.ANSI_RESET);
+						System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-10s%n", "StudentID", "Name" + ConsoleColors.ANSI_RESET);
 						System.out.println();
 						for(Student stu : students) {
 							System.out.printf("%-10d%-10s%n", stu.getStudentId(), stu.getName());
@@ -425,7 +442,10 @@ public class StudentGradeBookMenu {
 					int studentIdToAdd = 0;
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_ITALIC + "Which student would you like to add?" + ConsoleColors.ANSI_RESET);
+					
+					System.out.println(ConsoleColors.ANSI_CYAN);
 					studentIdToAdd = scan.nextInt();
+					System.out.println(ConsoleColors.ANSI_RESET);
 					
 					boolean success = teacherDao.addStudentToClass(studentIdToAdd, classId);
 					if(!success) {
@@ -438,7 +458,10 @@ public class StudentGradeBookMenu {
 					int studentIdToRemove = 0;
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_ITALIC + "Which student would you like to remove?" + ConsoleColors.ANSI_RESET);
+					
+					System.out.println(ConsoleColors.ANSI_CYAN);
 					studentIdToRemove = scan.nextInt();
+					System.out.println(ConsoleColors.ANSI_RESET);
 					
 					boolean removed = teacherDao.removeStudentFromClass(studentIdToRemove, classId);
 					if(!removed) {
@@ -448,7 +471,7 @@ public class StudentGradeBookMenu {
 					break;
 				case 6: 
 					active = false;
-					break;
+					return classChoice;
 				default:
 					throw new Exception(ConsoleColors.ANSI_RED + "Please enter a valid input" + ConsoleColors.ANSI_RESET);
 					
@@ -464,6 +487,7 @@ public class StudentGradeBookMenu {
 			}
 			
 		}
+		return classChoice;
 	}
 	
 	static public void createClass(Scanner scan, Teacher activeUser) {
@@ -474,6 +498,7 @@ public class StudentGradeBookMenu {
 		System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter the subject of the class\n" + ConsoleColors.ANSI_RESET);
 		
 		// Add validation here later
+		scan.nextLine();
 		String subject = scan.nextLine();
 		TeacherDao teacherDao = new TeacherDaoSql();
 		

@@ -160,7 +160,7 @@ public class TeacherDaoSql implements TeacherDao {
 			String name = null;
 			int grade = 0;
 			
-			System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
+			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
 			System.out.println();
 
 			while(rs.next()) {
@@ -291,7 +291,7 @@ public class TeacherDaoSql implements TeacherDao {
 			String name = null;
 			int grade = 0;
 			
-			System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
+			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
 			System.out.println();
 
 			while(rs.next()) {
@@ -322,7 +322,7 @@ public class TeacherDaoSql implements TeacherDao {
 			String name = null;
 			int grade = 0;
 			
-			System.out.printf(ConsoleColors.ANSI_YELLOW + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
+			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
 			System.out.println();
 
 			while(rs.next()) {
