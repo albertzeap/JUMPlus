@@ -48,6 +48,9 @@ public interface TeacherDao {
 	
 	// Get the class average
 	public double getClassAverage(int classId); 
+	
+	// Get the class median
+	public double getClassMedian(int classId);
 }
 
 

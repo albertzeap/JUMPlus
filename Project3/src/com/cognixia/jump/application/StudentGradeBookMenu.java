@@ -315,8 +315,12 @@ public class StudentGradeBookMenu {
 				System.out.println("====================================\n");
 				
 				double average = 0.0;
+				double median = 0.0;
 				average = teacherDao.getClassAverage(classId);
-				System.out.println("Class Average: " + average + "\n");
+				median = teacherDao.getClassMedian(classId);
+				
+				System.out.println("Class Average: " + average);
+				System.out.println("Class Median: " + median + "\n");
 				teacherDao.getStudentsInClass(classId);
 				System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 				classMenu(scan, classId);
@@ -335,7 +339,6 @@ public class StudentGradeBookMenu {
 		boolean active = true;
 		while(active) {
 			System.out.println(ConsoleColors.ANSI_ITALIC + "What would you like to do?\n" + ConsoleColors.ANSI_RESET);
-//			System.out.println("1. View Average and Median");
 			System.out.println("1. Sort Students by Name");
 			System.out.println("2. Sort Students by Grade");
 			System.out.println("3. Update Student Grade");
@@ -351,17 +354,21 @@ public class StudentGradeBookMenu {
 				classChoice = scan.nextInt();
 				
 				teacherDao.setConnection();
+				
 				double average = 0.0;
+				double median = 0.0;
+				
 				average = teacherDao.getClassAverage(classId);
+				median = teacherDao.getClassMedian(classId);
 				
 				switch(classChoice) {
-				
 				
 				case 1:
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Name");
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
-					System.out.println("Class Average: " + average + "\n");
+					System.out.println("Class Average: " + average);
+					System.out.println("Class Median: " + median + "\n");
 					teacherDao.sortByName(classId);
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
@@ -369,7 +376,8 @@ public class StudentGradeBookMenu {
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Grade");
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
-					System.out.println("Class Average: " + average + "\n");
+					System.out.println("Class Average: " + average);
+					System.out.println("Class Median: " + median + "\n");
 					teacherDao.sortByGrade(classId);
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;

@@ -365,5 +365,43 @@ public class TeacherDaoSql implements TeacherDao {
 		return average;
 	}
 
+	@Override
+	public double getClassMedian(int classId) {
+		double median = 0.0;
+		List<Double> grades = new ArrayList<>();
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT e.grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ? ORDER BY e.grade DESC;")) {
+			
+			pstmnt.setInt(1, classId);
+			ResultSet rs = pstmnt.executeQuery();
+			double grade = 0.0;
+			while(rs.next()) {
+				grade = rs.getDouble("e.grade");
+				grades.add(grade);
+			}
+			
+			
+			if(grades.isEmpty()) {
+				throw new Exception(ConsoleColors.ANSI_RED + "Could not retrieve class median" + ConsoleColors.ANSI_RESET);
+			}
+			
+			if(grades.size() % 2 == 0) {			
+				Double high = grades.get(grades.size() / 2);
+				Double low = grades.get((grades.size() / 2) - 1);
+				median = (high + low) / 2;
+				
+			} else {
+				median = grades.get(grades.size() / 2);
+			}
+			
+			
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		
+		return median;
+	}
+
 
 }
