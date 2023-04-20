@@ -61,6 +61,9 @@ public interface TeacherDao {
 	
 	// Add a student to a class
 	public boolean addStudentToClass(int studentId, int classId);
+	
+	// Remove a student from a class
+	public boolean removeStudentFromClass(int studentId, int classId);
 }
 
 

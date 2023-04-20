@@ -486,5 +486,26 @@ public class TeacherDaoSql implements TeacherDao {
 		return false;
 	}
 
+	@Override
+	public boolean removeStudentFromClass(int studentId, int classId) {
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("DELETE FROM enrolled WHERE studentId = ? AND classId = ?")) {
+			
+			pstmnt.setInt(1, studentId);
+			pstmnt.setInt(2, classId);
+			
+			int count = pstmnt.executeUpdate();
+			
+			if(count > 0) {
+				return true;
+			}
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		
+		return false;
+	}
+
 
 }

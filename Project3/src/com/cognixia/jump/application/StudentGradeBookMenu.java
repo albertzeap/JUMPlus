@@ -435,6 +435,16 @@ public class StudentGradeBookMenu {
 					break;
 				// Remove student
 				case 5:
+					int studentIdToRemove = 0;
+					System.out.println();
+					System.out.println(ConsoleColors.ANSI_ITALIC + "Which student would you like to remove?" + ConsoleColors.ANSI_RESET);
+					studentIdToRemove = scan.nextInt();
+					
+					boolean removed = teacherDao.removeStudentFromClass(studentIdToRemove, classId);
+					if(!removed) {
+						throw new Exception(ConsoleColors.ANSI_RED + "Error removing student from class" + ConsoleColors.ANSI_RESET);
+					}
+					System.out.println(ConsoleColors.ANSI_GREEN + "Student successfully removed from class!" + ConsoleColors.ANSI_RESET );
 					break;
 				case 6: 
 					active = false;
