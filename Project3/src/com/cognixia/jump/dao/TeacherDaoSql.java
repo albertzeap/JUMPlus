@@ -113,7 +113,7 @@ public class TeacherDaoSql implements TeacherDao {
 	@Override
 	public List<Classroom> viewClasses(int teacherId) {
 		
-		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT c.classId, subject FROM classroom c JOIN teaches t ON c.classId = t.classId WHERE t.teacherId = ?")) {
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT c.classId, subject FROM classroom c JOIN teaches t ON c.classId = t.classId WHERE t.teacherId = ? ORDER BY c.classId")) {
 			
 			pstmnt.setInt(1, teacherId);
 			
@@ -343,8 +343,26 @@ public class TeacherDaoSql implements TeacherDao {
 
 	@Override
 	public double getClassAverage(int classId) {
-		// TODO Auto-generated method stub
-		return 0;
+		double average = -1.0;
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT  ROUND(AVG(e.grade), 1) AS avg_grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ?")) {
+			
+			pstmnt.setInt(1, classId);
+			ResultSet rs = pstmnt.executeQuery();
+			while(rs.next()) {
+				average = rs.getDouble("avg_grade");
+			}
+			
+			if(average == -1.0) {
+				throw new Exception(ConsoleColors.ANSI_RED + "Could not get average" + ConsoleColors.ANSI_RESET);
+			}
+			
+			
+		} catch (Exception e) {
+			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+		}
+		
+		return average;
 	}
 
 

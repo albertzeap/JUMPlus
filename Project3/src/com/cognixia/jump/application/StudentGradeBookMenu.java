@@ -246,7 +246,7 @@ public class StudentGradeBookMenu {
 				break;
 				
 			} catch(InputMismatchException e) {
-				System.out.println(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(0-4)" + ConsoleColors.ANSI_RESET);
+				System.out.println(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
 				scan.nextLine();
 				
 			} catch (Exception e) {
@@ -288,35 +288,47 @@ public class StudentGradeBookMenu {
 	
 	
 	static public void selectClass(Scanner scan) {
+		boolean selectClassChoice = true;
 		
-		TeacherDao teacherDao = new TeacherDaoSql();
-		System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter the class you would like to view" + ConsoleColors.ANSI_RESET);
-		int classId = 0;
-		
-		try {
+		while (selectClassChoice) {
 			
-			classId = scan.nextInt();
+			TeacherDao teacherDao = new TeacherDaoSql();
+			System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter the class you would like to view" + ConsoleColors.ANSI_RESET);
+			int classId = 0;
 			
-			
-			teacherDao.setConnection();
-			
-			Optional<Classroom> found = teacherDao.getClassById(classId);
-			if(found.isEmpty()) {
-				throw new Exception(ConsoleColors.ANSI_RED + "Could not find selected class" + ConsoleColors.ANSI_RESET);
+			try {
+				
+				classId = scan.nextInt();
+				if(classId == 0) {
+					break;
+				}
+				
+				teacherDao.setConnection();
+				
+				Optional<Classroom> found = teacherDao.getClassById(classId);
+				if(found.isEmpty()) {
+					throw new Exception(ConsoleColors.ANSI_RED + "Could not find selected class" + ConsoleColors.ANSI_RESET);
+				}
+				
+				System.out.println("====================================");
+				System.out.println(found.get().getSubject());
+				System.out.println("====================================\n");
+				
+				double average = 0.0;
+				average = teacherDao.getClassAverage(classId);
+				System.out.println("Class Average: " + average + "\n");
+				teacherDao.getStudentsInClass(classId);
+				System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+				classMenu(scan, classId);
+				
+			} catch(InputMismatchException e) {
+				System.out.println(ConsoleColors.ANSI_RED + "Attempted to select invalid class. Please select one from the list" + ConsoleColors.ANSI_RESET);
+				scan.nextLine();
+			} catch (Exception e) {
+				System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 			}
-			
-			System.out.println("====================================");
-			System.out.println(found.get().getSubject());
-			System.out.println("====================================\n");
-			
-			
-			teacherDao.getStudentsInClass(classId);
-			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
-			classMenu(scan, classId);
-			
-		} catch (Exception e) {
-			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
+		
 	}
 	
 	static void classMenu(Scanner scan, int classId) {
@@ -339,6 +351,8 @@ public class StudentGradeBookMenu {
 				classChoice = scan.nextInt();
 				
 				teacherDao.setConnection();
+				double average = 0.0;
+				average = teacherDao.getClassAverage(classId);
 				
 				switch(classChoice) {
 				
@@ -347,6 +361,7 @@ public class StudentGradeBookMenu {
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Name");
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+					System.out.println("Class Average: " + average + "\n");
 					teacherDao.sortByName(classId);
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
@@ -354,6 +369,7 @@ public class StudentGradeBookMenu {
 					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Grade");
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
+					System.out.println("Class Average: " + average + "\n");
 					teacherDao.sortByGrade(classId);
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
