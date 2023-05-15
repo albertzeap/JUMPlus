@@ -1,3 +1,6 @@
 [submodule "Project4/tvtrackerUpgrade"]
 	path = Project4/tvtrackerUpgrade
 	url = https://github.com/marco3dog/tvtrackerUpgrade.git
+[submodule "Project5/DollarsBankFE"]
+	path = Project5/DollarsBankFE
+	url = https://github.com/albertzeap/DollarsBankFE.git
