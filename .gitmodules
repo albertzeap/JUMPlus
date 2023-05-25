@@ -4,3 +4,9 @@
 [submodule "Project5/DollarsBankFE"]
 	path = Project5/DollarsBankFE
 	url = https://github.com/albertzeap/DollarsBankFE.git
+[submodule "furniture-hub-ecommerce"]
+	path = furniture-hub-ecommerce
+	url = https://github.com/albertzeap/furniture-hub-ecommerce.git
+[submodule "Project6/furniture-hub-ecommerce"]
+	path = Project6/furniture-hub-ecommerce
+	url = https://github.com/albertzeap/furniture-hub-ecommerce.git
