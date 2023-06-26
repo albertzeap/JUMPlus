@@ -7,3 +7,6 @@
 [submodule "Project6/furniture-hub-ecommerce"]
 	path = Project6/furniture-hub-ecommerce
 	url = https://github.com/albertzeap/furniture-hub-ecommerce.git
+[submodule "Project7/PEP2-2"]
+	path = Project7/PEP2-2
+	url = https://github.com/rokamoto30/PEP2-2.git
