@@ -10,3 +10,6 @@
 [submodule "Project7/PEP2-2"]
 	path = Project7/PEP2-2
 	url = https://github.com/rokamoto30/PEP2-2.git
+[submodule "Project8/Furniture-Hub-Backend"]
+	path = Project8/Furniture-Hub-Backend
+	url = https://github.com/albertzeap/Furniture-Hub-Backend.git
