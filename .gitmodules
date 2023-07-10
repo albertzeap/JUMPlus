@@ -13,3 +13,6 @@
 [submodule "Project8/Furniture-Hub-Backend"]
 	path = Project8/Furniture-Hub-Backend
 	url = https://github.com/albertzeap/Furniture-Hub-Backend.git
+[submodule "Project1A/ExpenseTracker"]
+	path = Project1A/ExpenseTracker
+	url = https://github.com/albertzeap/ExpenseTracker.git
