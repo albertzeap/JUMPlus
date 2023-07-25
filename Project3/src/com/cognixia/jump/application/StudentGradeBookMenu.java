@@ -36,11 +36,14 @@ public class StudentGradeBookMenu {
 			
 			if(teacherMenuChoice == 3) {
 				System.out.println("Thank you for using Grade Book. We hope you had a pleasant experience!\n");
+				run();
 			}
 		}
 		if(firstMenuChoice == 3) {
-			System.out.println("Thank you for using Grade Book. We hope you had a pleasant experience!\n");
+			System.out.println("Exiting Grade Book application...\n");
+			return;
 		}
+		
 		
 		
 	}
@@ -64,7 +67,7 @@ public class StudentGradeBookMenu {
 				System.out.print(ConsoleColors.ANSI_CYAN);
 				firstMenuChoice = scan.nextInt();
 				System.out.print(ConsoleColors.ANSI_RESET);
-				if(firstMenuChoice != 1 && firstMenuChoice != 2 && firstMenuChoice != 3) {
+				if(firstMenuChoice < 1 || firstMenuChoice > 3) {
 					throw new Exception(ConsoleColors.ANSI_RED + "Invalid Input. Please select an option from above(1-3)" + ConsoleColors.ANSI_RESET);
 				}
 				return firstMenuChoice;
@@ -219,7 +222,7 @@ public class StudentGradeBookMenu {
 			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Welcome " + activeUser.getName()+ "!");
 			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 			
-			viewClasses(activeUser);
+			List<Classroom> classes = viewClasses(activeUser);
 			
 			System.out.println(ConsoleColors.ANSI_ITALIC + "What would you like to do?\n" + ConsoleColors.ANSI_RESET);
 			
@@ -235,9 +238,14 @@ public class StudentGradeBookMenu {
 				switch(teacherMenuChoice) {
 				
 				case 1:
-					selectClass(scan);
+//					if(!classes.isEmpty()) {
+						selectClass(scan);						
+//					} else {
+						System.out.println(ConsoleColors.ANSI_RED + "No classes to select" + ConsoleColors.ANSI_RESET);
+//					}
 					break;
 				case 2: 
+					
 					createClass(scan, activeUser);
 					break;
 				case 3:
@@ -263,7 +271,7 @@ public class StudentGradeBookMenu {
 		return teacherMenuChoice;
 	}
 	
-	static public void viewClasses(Teacher activeUser) {
+	static public List<Classroom> viewClasses(Teacher activeUser) {
 		
 		TeacherDao teacherDao = new TeacherDaoSql();
 		List<Classroom> classes = new ArrayList<>();
@@ -288,6 +296,8 @@ public class StudentGradeBookMenu {
 		} catch (Exception e) {
 			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
+		
+		return classes;
 		
 	}
 	
