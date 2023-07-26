@@ -1,13 +1,19 @@
 package com.cognixia.jump.application;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cognixia.jump.dao.StudentDao;
+import com.cognixia.jump.dao.StudentDaoSql;
 import com.cognixia.jump.dao.TeacherDao;
 import com.cognixia.jump.dao.TeacherDaoSql;
 import com.cognixia.jump.model.Classroom;
@@ -22,7 +28,7 @@ public class StudentGradeBookMenu {
 		
 		Scanner scan = new Scanner(System.in);
 		Teacher activeUser = null;
-		
+		Student activeStudentUser = null;
 		
 		int firstMenuChoice = landingMenu(scan);
 		if(firstMenuChoice == 1) {
@@ -30,11 +36,22 @@ public class StudentGradeBookMenu {
 			firstMenuChoice = landingMenu(scan);
 		}
 		if (firstMenuChoice == 2) {
-			int teacherMenuChoice = 0;
-			activeUser = loginMenu(scan);
-			teacherMenuChoice = teacherMenu(scan, activeUser);
+			int secondMenuChoice = 0;
 			
-			if(teacherMenuChoice == 3) {
+			// Determine whether returned list contains student or teacher
+			List<Object> users = loginMenu(scan);
+			
+			if(users.get(0) instanceof Student) {
+				activeStudentUser = (Student) users.get(0);
+				secondMenuChoice = dashboardMenu(scan, activeStudentUser);
+				
+			} else {
+				activeUser = (Teacher) users.get(0);
+				secondMenuChoice = dashboardMenu(scan,activeUser);
+			}
+			
+			
+			if(secondMenuChoice == 3) {
 				System.out.println("Thank you for using Grade Book. We hope you had a pleasant experience!\n");
 				run();
 			}
@@ -48,7 +65,8 @@ public class StudentGradeBookMenu {
 		
 	}
 	
-	static public int landingMenu (Scanner scan) {
+
+	private static int landingMenu (Scanner scan) {
 		int firstMenuChoice = 0;
 		
 		while(true) {
@@ -83,7 +101,7 @@ public class StudentGradeBookMenu {
 		}
 	}
 	
-	static public void registerMenu(Scanner scan) {
+	private static void registerMenu(Scanner scan) {
 		
 		while(true) {
 			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT +"====================================");
@@ -92,6 +110,7 @@ public class StudentGradeBookMenu {
 			
 			
 			TeacherDao teacherDao = new TeacherDaoSql();
+			StudentDao studentDao = new StudentDaoSql();
 			String username = null;
 			String password = null;
 			String name = null;
@@ -100,17 +119,25 @@ public class StudentGradeBookMenu {
 				
 				// Username validation 
 				boolean exists = true;
-				while (exists) {
+				boolean studentExists = true;
+				while (exists || studentExists) {
 					System.out.print(ConsoleColors.ANSI_RESET);
 					System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter your username:" + ConsoleColors.ANSI_RESET);
 					
 					System.out.print(ConsoleColors.ANSI_CYAN);
 					username = scan.next();
 					System.out.print(ConsoleColors.ANSI_RESET);
+					
 					// Check if username already exists
 					teacherDao.setConnection();
+					studentDao.setConnection();
+					
+					studentExists = studentDao.studentExists(username);
 					exists = teacherDao.teacherExists(username);
-					if(exists) {
+					
+					System.out.println("Student:" + studentExists + " Teacher:" + exists);
+					
+					if(exists || studentExists) {
 						System.out.println(ConsoleColors.ANSI_RED + "This username is taken. Please enter another one\n" + ConsoleColors.ANSI_RESET);
 					}
 				}
@@ -173,10 +200,11 @@ public class StudentGradeBookMenu {
 		}
 	}
 	
-	static public Teacher loginMenu(Scanner scan) {
+	private static List<Object> loginMenu(Scanner scan) {
 		String username = null;
 		String password = null;
 		TeacherDao teacherDao = new TeacherDaoSql();
+		StudentDao studentDao = new StudentDaoSql();
 		
 
 		System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================");
@@ -196,13 +224,25 @@ public class StudentGradeBookMenu {
 			
 			try {
 				teacherDao.setConnection();
-				Optional<Teacher> valid = teacherDao.login(username, password);
-				if (valid.isEmpty()) {
-					System.out.println(ConsoleColors.ANSI_RED + "Invalid credentials\n" + ConsoleColors.ANSI_RESET);
-				} else {
+				studentDao.setConnection();
+				
+				Optional<Teacher> teacher = teacherDao.login(username, password);
+				Optional<Student> student = studentDao.login(username, password);
+				List<Object> users = new ArrayList<>();
+				
+				
+				if(teacher.isPresent() && student.isEmpty()) {
 					System.out.println(ConsoleColors.ANSI_GREEN + "Successfully logged in!\n" + ConsoleColors.ANSI_RESET);
-					return valid.get();
+					users.add(teacher.get());
+					return users;
+				} else if(student.isPresent() && teacher.isEmpty()) {
+					System.out.println(ConsoleColors.ANSI_GREEN + "Successfully logged in!\n" + ConsoleColors.ANSI_RESET);
+					users.add(student.get());
+					return users;
+				} else {
+					System.out.println(ConsoleColors.ANSI_RED + "Invalid credentials\n" + ConsoleColors.ANSI_RESET);
 				}
+				
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
@@ -212,7 +252,61 @@ public class StudentGradeBookMenu {
 		return null;
 	}
 	
-	static public int teacherMenu(Scanner scan, Teacher activeUser) {
+	private static int dashboardMenu(Scanner scan, Student activeStudentUser) {
+		int studentMenuChoice = 0;
+		boolean studentMenuActive = true;
+		
+		while(studentMenuActive) {
+			
+			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================");
+			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Welcome " + activeStudentUser.getName()+ "!");
+			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
+			
+			viewClasses(activeStudentUser);
+			
+			System.out.println(ConsoleColors.ANSI_ITALIC + "\nWhat would you like to do?\n" + ConsoleColors.ANSI_RESET);
+			
+			System.out.println("1. Select Class");
+			System.out.println("2. Exit\n");
+			
+			try {
+				System.out.print(ConsoleColors.ANSI_CYAN);
+				studentMenuChoice = scan.nextInt();
+				System.out.print(ConsoleColors.ANSI_RESET);
+				
+				switch(studentMenuChoice) {
+				
+				case 1:
+
+//					selectClass(scan);	
+					System.out.println("Feature not yet developed :)");
+
+					break;
+				case 2:
+					studentMenuActive = false;
+					studentMenuChoice = 3;
+					break;
+				default:
+					throw new Exception(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
+				}
+				
+				
+				
+				
+			} catch(InputMismatchException e) {
+				System.out.println(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
+				scan.nextLine();
+				
+			} catch (Exception e) {
+				System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+			}
+		}
+		
+		
+		return studentMenuChoice;
+	}
+	
+	private static int dashboardMenu(Scanner scan, Teacher activeUser) {
 		int teacherMenuChoice = 0;
 		boolean teacherMenuActive = true;
 		
@@ -271,7 +365,27 @@ public class StudentGradeBookMenu {
 		return teacherMenuChoice;
 	}
 	
-	static public List<Classroom> viewClasses(Teacher activeUser) {
+	private static void viewClasses(Student activeUser) {
+		
+		StudentDao studentDao = new StudentDaoSql();
+		
+		try {
+			
+			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-8s%-25s%-10s%n", "Class ID", "Subject", "Grade" + ConsoleColors.ANSI_RESET);
+			studentDao.setConnection();
+			List<Classroom> classes = studentDao.viewClasses(activeUser.getStudentId());
+		
+			if(classes == null) {
+				System.out.println("Not enrolled in any classes\n");
+			} 
+		
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static List<Classroom> viewClasses(Teacher activeUser) {
 		
 		TeacherDao teacherDao = new TeacherDaoSql();
 		List<Classroom> classes = new ArrayList<>();
