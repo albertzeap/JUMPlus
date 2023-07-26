@@ -12,6 +12,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cognixia.jump.controller.GradeBookController;
 import com.cognixia.jump.dao.StudentDao;
 import com.cognixia.jump.dao.StudentDaoSql;
 import com.cognixia.jump.dao.TeacherDao;
@@ -129,11 +130,13 @@ public class StudentGradeBookMenu {
 					System.out.print(ConsoleColors.ANSI_RESET);
 					
 					// Check if username already exists
-					teacherDao.setConnection();
+//					teacherDao.setConnection();
 					studentDao.setConnection();
 					
 					studentExists = studentDao.studentExists(username);
-					exists = teacherDao.teacherExists(username);
+//					exists = teacherDao.teacherExists(username);
+					exists = GradeBookController.getTeacherByUsername(username);
+					
 					
 					System.out.println("Student:" + studentExists + " Teacher:" + exists);
 					
@@ -183,8 +186,8 @@ public class StudentGradeBookMenu {
 					}
 				}
 				
-				Teacher teacher = new Teacher(0, username, password, name);
-				boolean created = teacherDao.register(teacher);
+				
+				boolean created = GradeBookController.createTeacher(0, username, password, name);
 				if(!created) {
 					throw new Exception(ConsoleColors.ANSI_RED + "Could not create user\n" + ConsoleColors.ANSI_RESET);
 				} else {
