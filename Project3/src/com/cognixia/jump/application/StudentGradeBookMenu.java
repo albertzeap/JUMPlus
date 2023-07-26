@@ -109,18 +109,16 @@ public class StudentGradeBookMenu {
 			System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT+ "Register for Grade Book");
 			System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 			
-			
-			TeacherDao teacherDao = new TeacherDaoSql();
-			StudentDao studentDao = new StudentDaoSql();
-			String username = null;
-			String password = null;
-			String name = null;
+			String username = "";
+			String password = "";
+			String name = "";
 			
 			try {
 				
 				// Username validation 
 				boolean exists = true;
 				boolean studentExists = true;
+				
 				while (exists || studentExists) {
 					System.out.print(ConsoleColors.ANSI_RESET);
 					System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter your username:" + ConsoleColors.ANSI_RESET);
@@ -130,15 +128,11 @@ public class StudentGradeBookMenu {
 					System.out.print(ConsoleColors.ANSI_RESET);
 					
 					// Check if username already exists
-//					teacherDao.setConnection();
-					studentDao.setConnection();
-					
-					studentExists = studentDao.studentExists(username);
-//					exists = teacherDao.teacherExists(username);
+					studentExists = GradeBookController.getStudentByUsername(username);
 					exists = GradeBookController.getTeacherByUsername(username);
 					
 					
-					System.out.println("Student:" + studentExists + " Teacher:" + exists);
+//					System.out.println("Student:" + studentExists + " Teacher:" + exists);
 					
 					if(exists || studentExists) {
 						System.out.println(ConsoleColors.ANSI_RED + "This username is taken. Please enter another one\n" + ConsoleColors.ANSI_RESET);
@@ -204,17 +198,17 @@ public class StudentGradeBookMenu {
 	}
 	
 	private static List<Object> loginMenu(Scanner scan) {
-		String username = null;
-		String password = null;
-		TeacherDao teacherDao = new TeacherDaoSql();
-		StudentDao studentDao = new StudentDaoSql();
+		String username = "";
+		String password = "";
+		List<Object> users = new ArrayList<>();
 		
-
 		System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================");
 		System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Login to Grade Book");
 		System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT +  "====================================\n" + ConsoleColors.ANSI_RESET);
+		
 		boolean authenticated = false;
 		while(!authenticated) {
+			
 			System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter your username:" + ConsoleColors.ANSI_RESET);
 			System.out.print(ConsoleColors.ANSI_CYAN);
 			username = scan.next();
@@ -225,34 +219,18 @@ public class StudentGradeBookMenu {
 			password = scan.next();
 			System.out.print(ConsoleColors.ANSI_RESET);
 			
-			try {
-				teacherDao.setConnection();
-				studentDao.setConnection();
-				
-				Optional<Teacher> teacher = teacherDao.login(username, password);
-				Optional<Student> student = studentDao.login(username, password);
-				List<Object> users = new ArrayList<>();
+			users = GradeBookController.loginUser(username, password);
 				
 				
-				if(teacher.isPresent() && student.isEmpty()) {
-					System.out.println(ConsoleColors.ANSI_GREEN + "Successfully logged in!\n" + ConsoleColors.ANSI_RESET);
-					users.add(teacher.get());
-					return users;
-				} else if(student.isPresent() && teacher.isEmpty()) {
-					System.out.println(ConsoleColors.ANSI_GREEN + "Successfully logged in!\n" + ConsoleColors.ANSI_RESET);
-					users.add(student.get());
-					return users;
-				} else {
-					System.out.println(ConsoleColors.ANSI_RED + "Invalid credentials\n" + ConsoleColors.ANSI_RESET);
-				}
-				
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
-			
+			if(!users.isEmpty()) {
+				System.out.println(ConsoleColors.ANSI_GREEN + "Successfully logged in!\n" + ConsoleColors.ANSI_RESET);
+				authenticated = true;
+			} else {
+				System.out.println(ConsoleColors.ANSI_RED + "Invalid credentials\n" + ConsoleColors.ANSI_RESET);
+			}			
 		}
 		
-		return null;
+		return users;
 	}
 	
 	private static int dashboardMenu(Scanner scan, Student activeStudentUser) {
