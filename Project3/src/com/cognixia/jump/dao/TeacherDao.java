@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.cognixia.jump.model.Classroom;
@@ -27,7 +28,7 @@ public interface TeacherDao {
 	public List<Classroom> viewClasses(int teacherId);
 	
 	// Select class and show students in class
-	public Optional<Classroom> getStudentsInClass(int classId);
+	public Map<Student, Integer> getStudentsInClass(int classId);
 	
 	// Select class by Id
 	public Optional<Classroom> getClassById(int classId);
@@ -42,10 +43,10 @@ public interface TeacherDao {
 	public boolean linkTeacherToClass(int classId, int teacherId);
 	
 	// Sort by student name
-	public void sortByName(int classId);
+	public Map<Student,Integer> sortByName(int classId);
 	
 	// Sort by student grades
-	public void sortByGrade(int classId);
+	public Map<Student,Integer> sortByGrade(int classId);
 	
 	// Get the class average
 	public double getClassAverage(int classId); 

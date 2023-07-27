@@ -7,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.cognixia.jump.connection.BetterConnectionManager;
@@ -87,14 +89,14 @@ public class StudentDaoSql implements StudentDao {
 	}
 
 	@Override
-	public List<Classroom> viewClasses(int studentId) {
+	public Map<Classroom, Integer> viewClasses(int studentId) {
+		Map<Classroom, Integer> classes = new HashMap<>();
 		
 		try(PreparedStatement ps = conn.prepareStatement("SELECT c.classId, c.subject, e.grade  FROM classroom c JOIN enrolled e ON e.classId = c.classId WHERE e.studentId = ?")) {
 			
 			ps.setInt(1, studentId);
 			
 			ResultSet rs = ps.executeQuery();
-			List<Classroom> classes = new ArrayList<>();
 			
 			while(rs.next()) {
 				int classId = rs.getInt(1);
@@ -102,20 +104,15 @@ public class StudentDaoSql implements StudentDao {
 				int grade = rs.getInt(3);
 				
 				if(subject != null) {
-					classes.add(new Classroom(classId, subject));
-					System.out.printf("%-8d%-25s%-10d%n", classId, subject, grade);					
+					classes.put(new Classroom(classId, subject), grade);					
 				}
-				
-				return classes;
-				
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		
-		return null;
+		return classes;
 	}
 
 }

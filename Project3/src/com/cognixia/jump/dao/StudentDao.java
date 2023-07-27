@@ -3,7 +3,7 @@ package com.cognixia.jump.dao;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.cognixia.jump.model.Classroom;
@@ -20,7 +20,7 @@ public interface StudentDao {
 	public Optional<Student> login(String username, String password);
 	
 	// View classes student is in
-	public List<Classroom> viewClasses(int studentId);
+	public Map<Classroom, Integer> viewClasses(int studentId);
 	
 	
 	

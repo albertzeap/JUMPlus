@@ -7,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.cognixia.jump.connection.BetterConnectionManager;
@@ -114,6 +116,8 @@ public class TeacherDaoSql implements TeacherDao {
 	@Override
 	public List<Classroom> viewClasses(int teacherId) {
 		
+		List<Classroom> classes = new ArrayList<>();
+		
 		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT c.classId, subject FROM classroom c JOIN teaches t ON c.classId = t.classId WHERE t.teacherId = ? ORDER BY c.classId")) {
 			
 			pstmnt.setInt(1, teacherId);
@@ -122,7 +126,6 @@ public class TeacherDaoSql implements TeacherDao {
 			
 			int classId = 0; 
 			String subject = null;
-			List<Classroom> classes = new ArrayList<>();
 			
 			while(rs.next()) {
 				classId = rs.getInt("c.classId");
@@ -137,40 +140,38 @@ public class TeacherDaoSql implements TeacherDao {
 				
 			}
 			
-			return classes;
-			
-			
 		} catch (Exception e) {
 			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 		
 		
-		return null;
+		return classes;
 	}
 
 	@Override
-	public Optional<Classroom> getStudentsInClass(int classId) {
+	public Map<Student, Integer> getStudentsInClass(int classId) {
 		
-		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT s.studentId, s.name, e.grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ?")) {
+		Map<Student, Integer> students = new LinkedHashMap<>();
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT s.studentId, s.username, s.password, s.name, e.grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ?")) {
 			
 			pstmnt.setInt(1, classId);
 			ResultSet rs = pstmnt.executeQuery();
 			
-			int studentId = 0;
-			String name = null;
-			int grade = 0;
-			
-			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
-			System.out.println();
 
 			while(rs.next()) {
 				
-				studentId = rs.getInt("s.studentId");
-				name = rs.getString("s.name");
-				grade = rs.getInt("e.grade");
+				int studentId = rs.getInt("s.studentId");
+				String username = rs.getString("username");
+				String password = rs.getString("password");
+				String name = rs.getString("s.name");
+				int grade = rs.getInt("e.grade");
 				
-				System.out.printf("%-10d%-20s%-10d%n", studentId, name, grade);
+				students.put(new Student(studentId, username, password, name), grade);
+				
 			}
+			rs.close();
+			
 			System.out.println();
 			
 		} catch (Exception e) {
@@ -178,7 +179,7 @@ public class TeacherDaoSql implements TeacherDao {
 		}
 		
 		
-		return Optional.empty();
+		return students;
 	}
 	
 	@Override
@@ -281,26 +282,30 @@ public class TeacherDaoSql implements TeacherDao {
 	}
 
 	@Override
-	public void sortByName(int classId) {
-		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT s.studentId, s.name, e.grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ? ORDER BY s.name")) {
+	public Map<Student, Integer> sortByName(int classId) {
+		
+		Map<Student, Integer> students = new LinkedHashMap<>();
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT s.studentId, s.username, s.password, s.name, e.grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ? ORDER BY s.name")) {
 			
 			pstmnt.setInt(1, classId);
 			ResultSet rs = pstmnt.executeQuery();
 			
-			int studentId = 0;
-			String name = null;
-			int grade = 0;
-			
-			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
-			System.out.println();
+//			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
+//			System.out.println();
 
 			while(rs.next()) {
 				
-				studentId = rs.getInt("s.studentId");
-				name = rs.getString("s.name");
-				grade = rs.getInt("e.grade");
+				int studentId = rs.getInt("s.studentId");
+				String username = rs.getString("s.username");
+				String password = rs.getString("s.password");
+				String name = rs.getString("s.name");
+				int grade = rs.getInt("e.grade");
 				
-				System.out.printf("%-10d%-20s%-10d%n", studentId, name, grade);
+//				System.out.printf("%-10d%-20s%-10d%n", studentId, name, grade);
+				students.put(new Student(studentId, username, password, name), grade);
+				
+				
 			}
 			System.out.println();
 			
@@ -308,30 +313,33 @@ public class TeacherDaoSql implements TeacherDao {
 		} catch (Exception e) {
 			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
-		
+	
+		return students;
 	}
 
 	@Override
-	public void sortByGrade(int classId) {
-		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT s.studentId, s.name, e.grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ? ORDER BY e.grade DESC")) {
+	public Map<Student, Integer> sortByGrade(int classId) {
+		
+		Map<Student, Integer> students = new LinkedHashMap<>();
+		
+		try(PreparedStatement pstmnt = conn.prepareStatement("SELECT s.studentId, s.username, s.password, s.name, e.grade FROM student s JOIN enrolled e ON s.studentId = e.studentId WHERE classId = ? ORDER BY e.grade DESC")) {
 			
 			pstmnt.setInt(1, classId);
 			ResultSet rs = pstmnt.executeQuery();
 			
-			int studentId = 0;
-			String name = null;
-			int grade = 0;
-			
-			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
-			System.out.println();
+//			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
+//			System.out.println();
 
 			while(rs.next()) {
 				
-				studentId = rs.getInt("s.studentId");
-				name = rs.getString("s.name");
-				grade = rs.getInt("e.grade");
+				int studentId = rs.getInt("s.studentId");
+				String username = rs.getString("s.username");
+				String password = rs.getString("s.password");
+				String name = rs.getString("s.name");
+				int grade = rs.getInt("e.grade");
 				
-				System.out.printf("%-10d%-20s%-10d%n", studentId, name, grade);
+//				System.out.printf("%-10d%-20s%-10d%n", studentId, name, grade);
+				students.put(new Student(studentId, username, password, name), grade);
 			}
 			System.out.println();
 			
@@ -340,6 +348,7 @@ public class TeacherDaoSql implements TeacherDao {
 			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 		}
 		
+		return students;
 	}
 
 	@Override
@@ -421,6 +430,7 @@ public class TeacherDaoSql implements TeacherDao {
 			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			return false;
 		}
 		
 		

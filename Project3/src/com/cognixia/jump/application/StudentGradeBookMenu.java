@@ -1,20 +1,15 @@
 package com.cognixia.jump.application;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.cognixia.jump.controller.GradeBookController;
-import com.cognixia.jump.dao.StudentDao;
-import com.cognixia.jump.dao.StudentDaoSql;
 import com.cognixia.jump.dao.TeacherDao;
 import com.cognixia.jump.dao.TeacherDaoSql;
 import com.cognixia.jump.model.Classroom;
@@ -23,6 +18,8 @@ import com.cognixia.jump.model.Teacher;
 import com.cognixia.jump.util.ConsoleColors;
 
 public class StudentGradeBookMenu {
+	
+	private static GradeBookController controller = new GradeBookController();
 	
 	
 	static public void run() {
@@ -61,12 +58,8 @@ public class StudentGradeBookMenu {
 			System.out.println("Exiting Grade Book application...\n");
 			return;
 		}
-		
-		
-		
 	}
 	
-
 	private static int landingMenu (Scanner scan) {
 		int firstMenuChoice = 0;
 		
@@ -97,8 +90,7 @@ public class StudentGradeBookMenu {
 			} catch (Exception e) {
 				System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 			}
-			
-			
+				
 		}
 	}
 	
@@ -128,11 +120,8 @@ public class StudentGradeBookMenu {
 					System.out.print(ConsoleColors.ANSI_RESET);
 					
 					// Check if username already exists
-					studentExists = GradeBookController.getStudentByUsername(username);
-					exists = GradeBookController.getTeacherByUsername(username);
-					
-					
-//					System.out.println("Student:" + studentExists + " Teacher:" + exists);
+					studentExists = controller.getStudentByUsername(username);
+					exists = controller.getTeacherByUsername(username);
 					
 					if(exists || studentExists) {
 						System.out.println(ConsoleColors.ANSI_RED + "This username is taken. Please enter another one\n" + ConsoleColors.ANSI_RESET);
@@ -181,7 +170,7 @@ public class StudentGradeBookMenu {
 				}
 				
 				
-				boolean created = GradeBookController.createTeacher(0, username, password, name);
+				boolean created = controller.createTeacher(0, username, password, name);
 				if(!created) {
 					throw new Exception(ConsoleColors.ANSI_RED + "Could not create user\n" + ConsoleColors.ANSI_RESET);
 				} else {
@@ -219,7 +208,7 @@ public class StudentGradeBookMenu {
 			password = scan.next();
 			System.out.print(ConsoleColors.ANSI_RESET);
 			
-			users = GradeBookController.loginUser(username, password);
+			users = controller.loginUser(username, password);
 				
 				
 			if(!users.isEmpty()) {
@@ -258,10 +247,7 @@ public class StudentGradeBookMenu {
 				switch(studentMenuChoice) {
 				
 				case 1:
-
-//					selectClass(scan);	
 					System.out.println("Feature not yet developed :)");
-
 					break;
 				case 2:
 					studentMenuActive = false;
@@ -271,9 +257,6 @@ public class StudentGradeBookMenu {
 					throw new Exception(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
 				}
 				
-				
-				
-				
 			} catch(InputMismatchException e) {
 				System.out.println(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
 				scan.nextLine();
@@ -282,8 +265,6 @@ public class StudentGradeBookMenu {
 				System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
 			}
 		}
-		
-		
 		return studentMenuChoice;
 	}
 	
@@ -313,14 +294,9 @@ public class StudentGradeBookMenu {
 				switch(teacherMenuChoice) {
 				
 				case 1:
-//					if(!classes.isEmpty()) {
-						selectClass(scan);						
-//					} else {
-						System.out.println(ConsoleColors.ANSI_RED + "No classes to select" + ConsoleColors.ANSI_RESET);
-//					}
+					selectClass(scan, classes);						
 					break;
 				case 2: 
-					
 					createClass(scan, activeUser);
 					break;
 				case 3:
@@ -329,10 +305,7 @@ public class StudentGradeBookMenu {
 				default:
 					throw new Exception(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
 				}
-				
-				
-				
-				
+
 			} catch(InputMismatchException e) {
 				System.out.println(ConsoleColors.ANSI_RED + "Invalid input. Please enter a valid option(1-3)" + ConsoleColors.ANSI_RESET);
 				scan.nextLine();
@@ -347,49 +320,34 @@ public class StudentGradeBookMenu {
 	}
 	
 	private static void viewClasses(Student activeUser) {
+	
+		Map<Classroom, Integer> classes = controller.viewStudentClasses(activeUser.getStudentId());
 		
-		StudentDao studentDao = new StudentDaoSql();
-		
-		try {
-			
+		// Print out the classes if the map is not empty
+		if(!classes.isEmpty()) {
 			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-8s%-25s%-10s%n", "Class ID", "Subject", "Grade" + ConsoleColors.ANSI_RESET);
-			studentDao.setConnection();
-			List<Classroom> classes = studentDao.viewClasses(activeUser.getStudentId());
-		
-			if(classes == null) {
-				System.out.println("Not enrolled in any classes\n");
-			} 
-		
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+			for(Map.Entry<Classroom, Integer> entry : classes.entrySet()) {
+				
+				System.out.printf("%-8d%-25s%-10d%n", entry.getKey().getClassId(), entry.getKey().getSubject(), entry.getValue());	
+			}			
+		} else {
+			System.out.println("Not enrolled in any classes\n");
 		}
 	}
 	
 	private static List<Classroom> viewClasses(Teacher activeUser) {
-		
-		TeacherDao teacherDao = new TeacherDaoSql();
-		List<Classroom> classes = new ArrayList<>();
-		
-		try {
+	
+		List<Classroom> classes = controller.viewTeacherClasses(activeUser.getTeacherId());
 			
-			teacherDao.setConnection();
-			classes = teacherDao.viewClasses(activeUser.getTeacherId());
+		if(classes.isEmpty()) {
+			System.out.println("No classes currently being taught\n");
+		} else {
 			
-			if(classes.isEmpty()) {
-				System.out.println("No classes currently being taught\n");
-			} else {
-				
-				 System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-10s%n", "Class ID", "Subject" + ConsoleColors.ANSI_RESET);
-				for(Classroom subject : classes) {
-					System.out.printf("%-10s%-10s%n", subject.getClassId(), subject.getSubject());
-				}
-				System.out.println();
+			System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-10s%n", "Class ID", "Subject" + ConsoleColors.ANSI_RESET);
+			for(Classroom subject : classes) {
+				System.out.printf("%-10s%-10s%n", subject.getClassId(), subject.getSubject());
 			}
-			
-			
-		} catch (Exception e) {
-			System.out.println(ConsoleColors.ANSI_RED + e.getMessage() + ConsoleColors.ANSI_RESET);
+			System.out.println();
 		}
 		
 		return classes;
@@ -397,12 +355,11 @@ public class StudentGradeBookMenu {
 	}
 	
 	
-	static public void selectClass(Scanner scan) {
+	private static void selectClass(Scanner scan, List<Classroom> classes) {
 		boolean selectClassChoice = true;
 		
 		while (selectClassChoice) {
 			
-			TeacherDao teacherDao = new TeacherDaoSql();
 			System.out.println(ConsoleColors.ANSI_ITALIC + "Please enter the class you would like to view" + ConsoleColors.ANSI_RESET);
 			int classId = 0;
 			
@@ -415,9 +372,7 @@ public class StudentGradeBookMenu {
 					break;
 				}
 				
-				teacherDao.setConnection();
-				
-				Optional<Classroom> found = teacherDao.getClassById(classId);
+				Optional<Classroom> found = controller.getClassById(classId);
 				if(found.isEmpty()) {
 					throw new Exception(ConsoleColors.ANSI_RED + "Could not find selected class" + ConsoleColors.ANSI_RESET);
 				}
@@ -426,14 +381,26 @@ public class StudentGradeBookMenu {
 				System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + found.get().getSubject());
 				System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "====================================\n" + ConsoleColors.ANSI_RESET);
 				
-				double average = 0.0;
-				double median = 0.0;
-				average = teacherDao.getClassAverage(classId);
-				median = teacherDao.getClassMedian(classId);
+				Map<Student, Integer> students = controller.getStudentsInClass(classId);
+				List<Double> averageMedian = new ArrayList<>();
 				
-				System.out.println( ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Average: " + average + ConsoleColors.ANSI_RESET);
-				System.out.println( ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Median: " + median + "\n" + ConsoleColors.ANSI_RESET);
-				teacherDao.getStudentsInClass(classId);
+				if(students.isEmpty()) {
+					System.out.println("No students in class");
+					System.out.println();
+				} else {
+					averageMedian = controller.getClassAverageMedian(classId);
+					System.out.println( ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Average: " + averageMedian.get(0) + ConsoleColors.ANSI_RESET);
+					System.out.println( ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Median: " + averageMedian.get(1) + "\n" + ConsoleColors.ANSI_RESET);
+					
+					System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
+					System.out.println();
+					
+					for(Map.Entry<Student, Integer> student: students.entrySet()) {
+						
+						System.out.printf("%-10d%-20s%-10d%n", student.getKey().getStudentId(), student.getKey().getName(), student.getValue());
+					}
+				}
+				
 				System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 				int classMenuChoice = classMenu(scan, classId);
 				
@@ -452,9 +419,10 @@ public class StudentGradeBookMenu {
 		
 	}
 	
-	static int classMenu(Scanner scan, int classId) {
+	private static int classMenu(Scanner scan, int classId) {
 		boolean active = true;
 		int classChoice = 0;
+		
 		while(active) {
 			System.out.println(ConsoleColors.ANSI_ITALIC + "What would you like to do?\n" + ConsoleColors.ANSI_RESET);
 			System.out.println("1. Sort Students by Name");
@@ -465,54 +433,70 @@ public class StudentGradeBookMenu {
 			System.out.println("6. Exit\n");
 			// Add exit option here
 			
-			TeacherDao teacherDao = new TeacherDaoSql();
-			
 			try {
 				System.out.println(ConsoleColors.ANSI_CYAN);
 				classChoice = scan.nextInt();
 				System.out.println(ConsoleColors.ANSI_RESET);
 				
-				teacherDao.setConnection();
 				
-				double average = 0.0;
-				double median = 0.0;
-				
-				
+				Map<Student, Integer> studentsInClass = controller.getStudentsInClass(classId);
+				List<Double> averageMedian = controller.getClassAverageMedian(classId);
 				switch(classChoice) {
 				
 				// Sort by name
 				case 1:
-					average = teacherDao.getClassAverage(classId);
-					median = teacherDao.getClassMedian(classId);
+					if(studentsInClass.isEmpty()) {
+						throw new Exception("No students to sort.");
+					}
 					
-					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Name");
 					System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
-					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC + "Class Average: " + average + ConsoleColors.ANSI_RESET);
-					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC + "Class Median: "  + median + "\n" + ConsoleColors.ANSI_RESET);
-					teacherDao.sortByName(classId);
+					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC + "Class Average: " + averageMedian.get(0) + ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC + "Class Median: "  + averageMedian.get(1) + "\n" + ConsoleColors.ANSI_RESET);
+					studentsInClass = controller.sortByName(classId);
+					
+					System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
+					System.out.println();
+					for(Map.Entry<Student, Integer> student: studentsInClass.entrySet()) {
+						
+						System.out.printf("%-10d%-20s%-10d%n", student.getKey().getStudentId(), student.getKey().getName(), student.getValue());
+					}
+					
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
 					
 				// Sort by grade
 				case 2:
-					average = teacherDao.getClassAverage(classId);
-					median = teacherDao.getClassMedian(classId);
+					
+					if(studentsInClass.isEmpty()) {
+						throw new Exception("No students to sort.");
+					}
 
-					System.out.println();
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "Class By Grade");
 					System.out.println(ConsoleColors.ANSI_BLUE_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
-					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Average: " + average + ConsoleColors.ANSI_RESET);
-					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Median: " +  median + "\n" + ConsoleColors.ANSI_RESET);
-					teacherDao.sortByGrade(classId);
+					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Average: " +  averageMedian.get(0) + ConsoleColors.ANSI_RESET);
+					System.out.println(ConsoleColors.ANSI_YELLOW + ConsoleColors.ANSI_ITALIC +"Class Median: " +   averageMedian.get(1) + "\n" + ConsoleColors.ANSI_RESET);
+					studentsInClass = controller.sortByGrade(classId);
+					
+					System.out.printf(ConsoleColors.YELLOW_UNDERLINED + "%-10s%-20s%-10s%n", "StudentID", "Name", "Grade" + ConsoleColors.ANSI_RESET);
+					System.out.println();
+					for(Map.Entry<Student, Integer> student: studentsInClass.entrySet()) {
+						
+						System.out.printf("%-10d%-20s%-10d%n", student.getKey().getStudentId(), student.getKey().getName(), student.getValue());
+					}
+					
 					System.out.println(ConsoleColors.ANSI_WHITE_BOLD_BRIGHT + "------------------------------------\n" + ConsoleColors.ANSI_RESET);
 					break;
 					
 				// Update grade
 				case 3:
+					
+					if(studentsInClass.isEmpty()) {
+						throw new Exception("No students to update.");
+					}
+					
 					int studentId = 0;
 					int grade = 0;
-					System.out.println();
 					System.out.println(ConsoleColors.ANSI_ITALIC + "Which student grade would you like to update?" + ConsoleColors.ANSI_RESET);
 					
 					System.out.println(ConsoleColors.ANSI_CYAN);
@@ -524,12 +508,16 @@ public class StudentGradeBookMenu {
 					grade = scan.nextInt();
 					System.out.println(ConsoleColors.ANSI_RESET);
 					
-					teacherDao.updateStudentGrade(classId, studentId, grade);
+					boolean updated = controller.updateStudentGrade(classId, studentId, grade);
+					
+					if(updated) {
+						System.out.println(ConsoleColors.ANSI_GREEN + "Successfully updated!" + ConsoleColors.ANSI_RESET);
+					}
 					
 					break;
 				// Add student 
 				case 4:
-					List<Student> students = teacherDao.getAllStudentsNotInClass(classId);
+					List<Student> students = controller.getAllStudentsNotInClass(classId);
 					
 					if(students.isEmpty()) {
 						System.out.println("All students enrolled in class");
@@ -545,30 +533,29 @@ public class StudentGradeBookMenu {
 					}
 					
 					int studentIdToAdd = 0;
-					System.out.println();
 					System.out.println(ConsoleColors.ANSI_ITALIC + "Which student would you like to add?" + ConsoleColors.ANSI_RESET);
 					
 					System.out.println(ConsoleColors.ANSI_CYAN);
 					studentIdToAdd = scan.nextInt();
 					System.out.println(ConsoleColors.ANSI_RESET);
 					
-					boolean success = teacherDao.addStudentToClass(studentIdToAdd, classId);
+					boolean success = controller.addStudentToClass(studentIdToAdd, classId);
 					if(!success) {
 						throw new Exception(ConsoleColors.ANSI_RED + "Error adding student to class" + ConsoleColors.ANSI_RESET);
 					}
 					System.out.println(ConsoleColors.ANSI_GREEN + "Student successfully added to class!" + ConsoleColors.ANSI_RESET );
 					break;
+					
 				// Remove student
 				case 5:
 					int studentIdToRemove = 0;
-					System.out.println();
 					System.out.println(ConsoleColors.ANSI_ITALIC + "Which student would you like to remove?" + ConsoleColors.ANSI_RESET);
 					
 					System.out.println(ConsoleColors.ANSI_CYAN);
 					studentIdToRemove = scan.nextInt();
 					System.out.println(ConsoleColors.ANSI_RESET);
 					
-					boolean removed = teacherDao.removeStudentFromClass(studentIdToRemove, classId);
+					boolean removed = controller.removeStudentFromClass(studentIdToRemove, classId);
 					if(!removed) {
 						throw new Exception(ConsoleColors.ANSI_RED + "Error removing student from class" + ConsoleColors.ANSI_RESET);
 					}
@@ -581,9 +568,7 @@ public class StudentGradeBookMenu {
 					throw new Exception(ConsoleColors.ANSI_RED + "Please enter a valid input" + ConsoleColors.ANSI_RESET);
 					
 				}
-				
-				
-				
+					
 			} catch(InputMismatchException e) { 
 				System.out.println(ConsoleColors.ANSI_RED + "Please enter a valid input" + ConsoleColors.ANSI_RESET);
 				scan.nextLine();
