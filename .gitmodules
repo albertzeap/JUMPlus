@@ -19,3 +19,6 @@
 [submodule "Project2A/ContactManager"]
 	path = Project2A/ContactManager
 	url = https://github.com/albertzeap/ContactManager.git
+[submodule "albert-swe-portfolio"]
+	path = albert-swe-portfolio
+	url = https://github.com/albertzeap/albert-swe-portfolio.git
