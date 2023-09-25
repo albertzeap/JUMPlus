@@ -22,3 +22,6 @@
 [submodule "albert-swe-portfolio"]
 	path = albert-swe-portfolio
 	url = https://github.com/albertzeap/albert-swe-portfolio.git
+[submodule "language-learning-project"]
+	path = language-learning-project
+	url = https://github.com/wanderingAviator/language-learning-project.git
